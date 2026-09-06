@@ -261,9 +261,10 @@ export function LEDModel({ targetColor, reduced = false, small = false }: LEDMod
         castShadow
         shadow-mapSize={[1024, 1024]}
         shadow-bias={-0.0005}
-        shadow-normalBias={0.03}
-        shadow-camera-near={0.5}
-        shadow-camera-far={38}
+        shadow-camera-near={0.1}
+        shadow-camera-far={20}
+        shadow-mapSize-width={2048}
+        shadow-mapSize-height={2048}
       />
     </group>
   );

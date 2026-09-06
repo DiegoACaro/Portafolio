@@ -4,9 +4,10 @@ Command: npx gltfjsx@6.5.3 public/pcb.glb --types
 */
 
 import * as THREE from 'three'
-import React, { useEffect } from 'react'
+import React from 'react'
+import { useGraph } from '@react-three/fiber'
 import { useGLTF, OrthographicCamera } from '@react-three/drei'
-import { GLTF } from 'three-stdlib'
+import { GLTF, SkeletonUtils } from 'three-stdlib'
 
 type GLTFResult = GLTF & {
   nodes: {
@@ -577,26 +578,22 @@ type GLTFResult = GLTF & {
 }
 
 export function PCBModel(props: JSX.IntrinsicElements['group']) {
-  const { nodes, materials } = useGLTF('/pcb.glb') as GLTFResult
-const gltfData = useGLTF("/pcb.glb");
-
-useEffect(() => {
-  console.log("Objeto gltfData recibido:", gltfData);
-  console.log("Estado de gltfData.scene:", gltfData?.scene);
-
-  if (gltfData?.scene) {
-    let meshCount = 0;
-    gltfData.scene.traverse((child) => {
-      if ((child as THREE.Mesh).isMesh) {
-        meshCount++;
-      }
-    });
-    console.log("Mallas procesadas activamente:", meshCount);
-  }
-}, [gltfData]);
+  const { scene } = useGLTF('/pcb.glb')
+  const clone = React.useMemo(() => SkeletonUtils.clone(scene), [scene])
+  const { nodes, materials } = useGraph(clone) as GLTFResult
   return (
     <group {...props} dispose={null}>
-      <OrthographicCamera makeDefault={false} far={0.506} near={0.216} position={[0.11, -0.186, 0.212]} rotation={[0.827, 0.297, -0.115]} />
+      <OrthographicCamera makeDefault={false} far={0.445} near={0.156} position={[0.037, 0.033, 0.262]} rotation={[0.004, 0.073, 0.031]} />
+      <OrthographicCamera makeDefault={false} far={0.665} near={0.375} position={[0.019, 0.034, 0.478]} />
+      <OrthographicCamera makeDefault={false} far={0.665} near={0.375} position={[0.019, 0.034, 0.478]} />
+      <OrthographicCamera makeDefault={false} far={0.657} near={0.368} position={[0.019, 0.034, -0.458]} rotation={[-Math.PI, 0, -Math.PI]} />
+      <OrthographicCamera makeDefault={false} far={0.471} near={0.182} position={[-0.258, 0.034, 0.01]} rotation={[0, -Math.PI / 2, 0]} />
+      <OrthographicCamera makeDefault={false} far={0.468} near={0.178} position={[0.295, 0.034, 0.01]} rotation={[0, Math.PI / 2, 0]} />
+      <OrthographicCamera makeDefault={false} far={0.665} near={0.375} position={[0.019, 0.502, 0.01]} rotation={[-Math.PI / 2, 0, 0]} />
+      <OrthographicCamera makeDefault={false} far={0.657} near={0.368} position={[0.019, -0.434, 0.01]} rotation={[Math.PI / 2, 0, 0]} />
+      <OrthographicCamera makeDefault={false} far={0.665} near={0.375} position={[0.289, 0.305, 0.28]} rotation={[-0.785, 0.616, 0.524]} />
+      <OrthographicCamera makeDefault={false} far={0.65} near={0.36} position={[0.2, 0.267, 0.353]} rotation={[-0.597, 0.412, 0.265]} />
+      <OrthographicCamera makeDefault={false} far={0.662} near={0.372} position={[0.174, 0.189, 0.42]} rotation={[-0.361, 0.34, 0.125]} />
       <mesh geometry={nodes['Boardstep-1Open_CASCADE_STEP_translator_68_111step-1'].geometry} material={materials.defaultplastic} position={[0, 0, -0.002]} />
       <group position={[0.085, 0.012, 0]} rotation={[Math.PI / 2, 0, 0]}>
         <mesh geometry={nodes['T2step-1User_Library-SOT323_(SC70-3)-1step-1User_Library-SOT323_(SC70-3)-1_K_X_F6rper_1step-1'].geometry} material={materials.defaultplastic} rotation={[-Math.PI / 2, 0, Math.PI / 2]} />
