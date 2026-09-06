@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useEffect, useMemo, useState } from "react";
+import { memo, Suspense, useEffect, useMemo, useState } from "react";
 import { Canvas, useThree } from "@react-three/fiber";
 import { Environment, Lightformer } from "@react-three/drei";
 import { useReducedMotion } from "framer-motion";
@@ -120,7 +120,10 @@ const SceneContents = memo(function SceneContents({
 
       <ProceduralEnv />
 
-      <PCBBoard />
+      {/* la PCB (glb ~2 MB) carga de forma asincrona: aparece al estar lista */}
+      <Suspense fallback={null}>
+        <PCBBoard />
+      </Suspense>
       <LEDModel targetColor={target} reduced={reduced} small={small} />
     </>
   );
