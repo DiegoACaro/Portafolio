@@ -1,0 +1,109 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ------------------------------------------------------------------ *
+ *  Tokens globales
+ * ------------------------------------------------------------------ */
+:root {
+  /* Colores de estado del LED, uno por seccion. Reutilizados por JS
+     (lib/sections.ts) y por utilidades CSS. */
+  --led-hero: #00f0ff;
+  --led-about: #10b981;
+  --led-projects: #f59e0b;
+  --led-contact: #a855f7;
+
+  /* Color activo del sistema. El PCBBackground lo sincroniza con la
+     seccion visible; sirve de fallback para estilos puramente CSS. */
+  --sys-color: var(--led-hero);
+  --sys-rgb: 0, 240, 255;
+
+  color-scheme: dark;
+}
+
+/* ------------------------------------------------------------------ *
+ *  Base
+ * ------------------------------------------------------------------ */
+@layer base {
+  * {
+    border-color: theme("colors.pcb.line");
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background-color: theme("colors.pcb.bg");
+    color: theme("colors.slate.200");
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: rgba(0, 240, 255, 0.22);
+    color: #fff;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ *  Utilidades del proyecto
+ * ------------------------------------------------------------------ */
+@layer utilities {
+  /* Texto con serigrafia: mono, mayusculas y tracking amplio. */
+  .silkscreen {
+    font-family: theme("fontFamily.mono");
+    text-transform: uppercase;
+    letter-spacing: 0.32em;
+  }
+
+  /* Panel con estetica de placa / modulo. */
+  .panel-pcb {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0) 40%),
+      theme("colors.pcb.panel");
+    border: 1px solid theme("colors.pcb.line");
+    box-shadow: theme("boxShadow.smd");
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ *  Scrollbar acorde al tema (solo punteros finos)
+ * ------------------------------------------------------------------ */
+@media (pointer: fine) {
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0a0d14;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #1c2740;
+    border: 2px solid #0a0d14;
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #2a3a5c;
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ *  Accesibilidad: reduce motion
+ *  (las animaciones "vivas" se apagan; las transiciones de color del
+ *   LED tambien se controlan desde JS via useReducedMotion)
+ * ------------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .animate-led-breathe {
+    animation: none !important;
+  }
+}
