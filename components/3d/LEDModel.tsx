@@ -62,7 +62,7 @@ export function LEDModel({
   const base = useMemo<[number, number, number]>(
     () =>
       small
-        ? [1.3, 1.35, 2.6]
+        ? [3.3, 0.3, 1.8]
         : [3.3, 0.3, 1.8],
     [small]
   );
@@ -83,7 +83,6 @@ export function LEDModel({
   ] = [1.3, 0, 0];
 
   const scaleLED = 4;
-
 
   /*
    * ESCALA DEL GLB
