@@ -220,7 +220,7 @@ export function LEDModel({
     <group ref={group} position={base} scale={scale}>
       {/* 1. Malla 3D del LED */}
       <group
-        ref={meshGroupRef}
+        //ref={meshGroupRef}
         position={meshOffsetPosition}
         rotation={meshOffsetRotation}
         scale={scaleLED}
