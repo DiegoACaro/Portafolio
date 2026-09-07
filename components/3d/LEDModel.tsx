@@ -42,10 +42,11 @@ export function LEDModel({
   //   [small]
   // );
 
-    const base = useMemo<[number, number, number]>(
-    () => (small ? [1.3, 1.35, 2.6] : [3.3, 0.3, 1.8]),
-    [small]
-  );
+  //   const base = useMemo<[number, number, number]>(
+  //   () => (small ? [1.3, 1.35, 2.6] : [3.3, 0.3, 1.8]),
+  //   [small]
+  // );
+  const base: [number, number, number]  = [3.3, 0.3, 1.8];
  
 
   
@@ -220,7 +221,7 @@ export function LEDModel({
     <group ref={group} position={base} scale={scale}>
       {/* 1. Malla 3D del LED */}
       <group
-        //ref={meshGroupRef}
+        ref={meshGroupRef}
         position={meshOffsetPosition}
         rotation={meshOffsetRotation}
         scale={scaleLED}
