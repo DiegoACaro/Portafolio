@@ -49,7 +49,7 @@ export function LEDModel({
 
 
   
-  const scale = small ? 0.9 : 0.98;
+  //const scale = small ? 0.9 : 0.98;
 
   // Posiciones y rotación del modelo
   const meshOffsetPosition: [number, number, number] = [-3.3, 1, 0];
@@ -252,7 +252,7 @@ export function LEDModel({
 }, [small, base, clonedScene]);
 
   return (
-    <group ref={group} position={base} scale={scale}>
+    <group ref={group} position={base} scale={1}>
       {/* 1. Malla 3D del LED */}
       <group
         ref={meshGroupRef}
