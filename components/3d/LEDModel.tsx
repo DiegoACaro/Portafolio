@@ -42,12 +42,11 @@ export function LEDModel({
   //   [small]
   // );
 
-  //   const base = useMemo<[number, number, number]>(
-  //   () => (small ? [1.3, 1.35, 2.6] : [3.3, 0.3, 1.8]),
-  //   [small]
-  // );
-  const base: [number, number, number]  = [3.3, 0.3, 1.8];
- 
+    const base = useMemo<[number, number, number]>(
+    () => (small ? [1.3, 1.35, 2.6] : [3.3, 0.3, 1.8]),
+    [small]
+  );
+
 
   
   const scale = small ? 0.9 : 0.98;
@@ -216,6 +215,41 @@ export function LEDModel({
       halo.current.scale.setScalar(pulse);
     }
   });
+
+
+  useEffect(() => {
+  if (!group.current || !meshGroupRef.current) return;
+
+  group.current.updateMatrixWorld(true);
+  meshGroupRef.current.updateMatrixWorld(true);
+  clonedScene.updateMatrixWorld(true);
+
+  const groupWorld = new THREE.Vector3();
+  const meshGroupWorld = new THREE.Vector3();
+  const modelWorld = new THREE.Vector3();
+
+  group.current.getWorldPosition(groupWorld);
+  meshGroupRef.current.getWorldPosition(meshGroupWorld);
+  clonedScene.getWorldPosition(modelWorld);
+
+  console.log("===== LED TRANSFORM DEBUG =====");
+  console.log("small:", small);
+  console.log("base:", base);
+  console.log("group world:", groupWorld.toArray());
+  console.log("meshGroup local:", meshGroupRef.current.position.toArray());
+  console.log("meshGroup world:", meshGroupWorld.toArray());
+  console.log("GLB local:", clonedScene.position.toArray());
+  console.log("GLB world:", modelWorld.toArray());
+  console.log("GLB rotation:", clonedScene.rotation.toArray());
+  console.log("GLB scale:", clonedScene.scale.toArray());
+
+  const box = new THREE.Box3().setFromObject(clonedScene);
+  const center = new THREE.Vector3();
+
+  box.getCenter(center);
+
+  console.log("GLB visual center:", center.toArray());
+}, [small, base, clonedScene]);
 
   return (
     <group ref={group} position={base} scale={scale}>
