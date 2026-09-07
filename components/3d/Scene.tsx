@@ -22,6 +22,9 @@ import { LEDModel } from "./LEDModel";
 
 /**
  * Scene
+ * 
+ * 
+ * 
  * --------------------------------------------------------------------
  * Canvas global de React Three Fiber (fondo, sin interacción).
  *
