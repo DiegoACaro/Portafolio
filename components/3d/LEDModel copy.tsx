@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
-import { useFrame } from "@react-three/fiber";
-import { useGLTF } from "@react-three/drei";
+import { useFrame, useThree } from "@react-three/fiber";
+import { Billboard, useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 
 function dampColor(
@@ -30,41 +30,32 @@ export function LEDModel({
 
   const pointRef = useRef<THREE.PointLight>(null!);
   const spotRef = useRef<THREE.SpotLight>(null!);
+  const innerGlowMatRef = useRef<THREE.MeshBasicMaterial>(null!);
+
+  const { scene } = useThree();
 
   const gltf = useGLTF("/rgb_led.glb");
+  const clonedScene = useMemo(() => gltf.scene.clone(true), [gltf.scene]);
 
-  const clonedScene = useMemo(
-    () => gltf.scene.clone(true),
-    [gltf.scene]
-  );
+  // const base = useMemo<[number, number, number]>(
+  //   () => (small ? [1.3, 1.35, 2.6] : [3.3, 0.3, 1.8]),
+  //   [small]
+  // );
 
-  // --------------------------------------------------
-  // POSICIÓN PRINCIPAL DEL LED
-  // --------------------------------------------------
-
-  const base = useMemo<[number, number, number]>(
+    const base = useMemo<[number, number, number]>(
     () => (small ? [1.3, 1.35, 2.6] : [3.3, 0.3, 1.8]),
     [small]
   );
 
-  // --------------------------------------------------
-  // TRANSFORMACIÓN INTERNA DEL MODELO
-  // --------------------------------------------------
-
-  const meshOffsetPosition: [number, number, number] = [4.8, 0.35, 4.5];
+  // Posiciones y rotación del modelo
+  const meshOffsetPosition: [number, number, number] = [-3.3, 1, 0];
   const meshOffsetRotation: [number, number, number] = [1.3, 0, 0];
   const scaleLED = 2;
 
-  // --------------------------------------------------
-  // SPOTLIGHT
-  // --------------------------------------------------
-
+  // Coordenadas compartidas de la luz principal (Spotlight)
   const spotPosition: [number, number, number] = [6.3, 2.3, -0.3];
 
-  // --------------------------------------------------
-  // MATERIAL EPOXY
-  // --------------------------------------------------
-
+  // 1. Material traslúcido reactivo a la posición de la luz
   const epoxy = useMemo(
     () =>
       new THREE.MeshPhysicalMaterial({
@@ -79,15 +70,11 @@ export function LEDModel({
         ior: 1.5,
         thickness: 0.1,
         attenuationColor: new THREE.Color("#00F0FF"),
-        attenuationDistance: 0.45,
+        attenuationDistance: 0.45, // La luz disminuye rápido fuera del origen del spotlight
         specularIntensity: 1.0,
       }),
     []
   );
-
-  // --------------------------------------------------
-  // MATERIAL DE LAS PATAS
-  // --------------------------------------------------
 
   const legMat = useMemo(
     () =>
@@ -99,38 +86,20 @@ export function LEDModel({
     []
   );
 
-  // --------------------------------------------------
-  // GLOW INTERNO
-  // --------------------------------------------------
-
+  // 2. Destello interno (Flare) centrado directamente en el foco del Spotlight
   const innerGlowTex = useMemo(() => {
     const c = document.createElement("canvas");
-
     c.width = c.height = 128;
-
-    const ctx = c.getContext("2d")!;
-
-    const g = ctx.createRadialGradient(
-      64,
-      64,
-      0,
-      64,
-      64,
-      64
-    );
-
+    const g = c.getContext("2d")!.createRadialGradient(64, 64, 0, 64, 64, 64);
     g.addColorStop(0, "rgba(255,255,255,1)");
     g.addColorStop(0.2, "rgba(255,255,255,0.7)");
     g.addColorStop(0.6, "rgba(255,255,255,0.15)");
     g.addColorStop(1, "rgba(255,255,255,0)");
-
+    const ctx = c.getContext("2d")!;
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, 128, 128);
-
     const t = new THREE.CanvasTexture(c);
-
     t.colorSpace = THREE.SRGBColorSpace;
-
     return t;
   }, []);
 
@@ -147,124 +116,54 @@ export function LEDModel({
     [innerGlowTex]
   );
 
-  // --------------------------------------------------
-  // CONFIGURACIÓN DEL GLB
-  // --------------------------------------------------
-
   useEffect(() => {
-    /*
-     * Primero actualizamos las matrices para asegurarnos
-     * de que Box3 vea correctamente toda la geometría.
-     */
-    clonedScene.updateMatrixWorld(true);
-
-    /*
-     * Bounding box de toda la geometría.
-     */
     const box = new THREE.Box3().setFromObject(clonedScene);
-
     const size = new THREE.Vector3();
     box.getSize(size);
 
-    /*
-     * Centro visual de la geometría.
-     */
-    const worldCenter = new THREE.Vector3();
-    box.getCenter(worldCenter);
-
-    /*
-     * Convertimos el centro desde coordenadas del mundo
-     * a coordenadas locales del GLB.
-     */
-    const localCenter = clonedScene.worldToLocal(
-      worldCenter.clone()
-    );
-
-    /*
-     * Movemos el GLB para que el centro de su geometría
-     * coincida con su origen [0,0,0].
-     */
-    clonedScene.position.sub(localCenter);
-
-    /*
-     * Escalado automático.
-     */
-    const maxAxis = Math.max(
-      size.x,
-      size.y,
-      size.z
-    );
-
+    const maxAxis = Math.max(size.x, size.y, size.z);
     if (maxAxis > 0) {
       const targetSize = 2.0;
       const autoScale = targetSize / maxAxis;
-
       clonedScene.scale.setScalar(autoScale);
     }
 
-    // --------------------------------------------------
-    // MATERIALES
-    // --------------------------------------------------
-
     let index = 0;
-
     clonedScene.traverse((child) => {
-      if (!(child as THREE.Mesh).isMesh) return;
+      if ((child as THREE.Mesh).isMesh) {
+        const mesh = child as THREE.Mesh;
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
 
-      const mesh = child as THREE.Mesh;
-
-      mesh.castShadow = true;
-      mesh.receiveShadow = true;
-
-      const name = mesh.name.toLowerCase();
-
-      if (
-        index === 0 ||
-        name.includes("glass") ||
-        name.includes("epoxy") ||
-        name.includes("body") ||
-        name.includes("lens")
-      ) {
-        mesh.material = epoxy;
-      } else {
-        mesh.material = legMat;
+        const name = mesh.name.toLowerCase();
+        if (
+          index === 0 ||
+          name.includes("glass") ||
+          name.includes("epoxy") ||
+          name.includes("body") ||
+          name.includes("lens")
+        ) {
+          mesh.material = epoxy;
+        } else {
+          mesh.material = legMat;
+        }
+        index++;
       }
-
-      index++;
     });
   }, [clonedScene, epoxy, legMat]);
 
-  // --------------------------------------------------
-  // HALO
-  // --------------------------------------------------
-
   const haloTex = useMemo(() => {
     const c = document.createElement("canvas");
-
     c.width = c.height = 128;
-
-    const ctx = c.getContext("2d")!;
-
-    const g = ctx.createRadialGradient(
-      64,
-      64,
-      0,
-      64,
-      64,
-      64
-    );
-
+    const g = c.getContext("2d")!.createRadialGradient(64, 64, 0, 64, 64, 64);
     g.addColorStop(0, "rgba(255,255,255,0.55)");
     g.addColorStop(0.28, "rgba(255,255,255,0.22)");
     g.addColorStop(1, "rgba(255,255,255,0)");
-
+    const ctx = c.getContext("2d")!;
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, 128, 128);
-
     const t = new THREE.CanvasTexture(c);
-
     t.colorSpace = THREE.SRGBColorSpace;
-
     return t;
   }, []);
 
@@ -281,12 +180,8 @@ export function LEDModel({
       }),
     [haloTex]
   );
-
   const halo = useRef<THREE.Mesh>(null!);
 
-  // --------------------------------------------------
-  // CLEANUP
-  // --------------------------------------------------
 
   useEffect(
     () => () => {
@@ -297,88 +192,64 @@ export function LEDModel({
       innerGlowMat.dispose();
       innerGlowTex.dispose();
     },
-    [
-      epoxy,
-      legMat,
-      haloMat,
-      haloTex,
-      innerGlowMat,
-      innerGlowTex,
-    ]
+    [epoxy, legMat, haloMat, haloTex, innerGlowMat, innerGlowTex]
   );
-
-  // --------------------------------------------------
-  // ANIMACIÓN
-  // --------------------------------------------------
 
   useFrame((state, dt) => {
     const t = state.clock.elapsedTime;
 
-    dampColor(
-      epoxy.emissive,
-      targetColor,
-      3.4,
-      dt
-    );
+    dampColor(epoxy.emissive, targetColor, 3.4, dt);
+    dampColor(epoxy.attenuationColor, targetColor, 3.4, dt);
+    dampColor(haloMat.color, targetColor, 3.4, dt);
+    dampColor(innerGlowMat.color, targetColor, 3.4, dt);
 
-    dampColor(
-      epoxy.attenuationColor,
-      targetColor,
-      3.4,
-      dt
-    );
-
-    dampColor(
-      haloMat.color,
-      targetColor,
-      3.4,
-      dt
-    );
-
-    dampColor(
-      innerGlowMat.color,
-      targetColor,
-      3.4,
-      dt
-    );
-
-    if (pointRef.current) {
-      dampColor(
-        pointRef.current.color,
-        targetColor,
-        3.4,
-        dt
-      );
-    }
-
-    if (spotRef.current) {
-      dampColor(
-        spotRef.current.color,
-        targetColor,
-        3.4,
-        dt
-      );
-    }
+    if (pointRef.current) dampColor(pointRef.current.color, targetColor, 3.4, dt);
+    if (spotRef.current) dampColor(spotRef.current.color, targetColor, 3.4, dt);
 
     if (halo.current) {
-      const pulse = reduced
-        ? 1
-        : 1 + Math.sin(t * 2.2) * 0.06;
-
+      const pulse = reduced ? 1 : 1 + Math.sin(t * 2.2) * 0.06;
       halo.current.scale.setScalar(pulse);
     }
   });
 
-  // --------------------------------------------------
-  // RENDER
-  // --------------------------------------------------
+
+  useEffect(() => {
+  if (!group.current || !meshGroupRef.current) return;
+
+  group.current.updateMatrixWorld(true);
+  meshGroupRef.current.updateMatrixWorld(true);
+  clonedScene.updateMatrixWorld(true);
+
+  const groupWorld = new THREE.Vector3();
+  const meshGroupWorld = new THREE.Vector3();
+  const modelWorld = new THREE.Vector3();
+
+  group.current.getWorldPosition(groupWorld);
+  meshGroupRef.current.getWorldPosition(meshGroupWorld);
+  clonedScene.getWorldPosition(modelWorld);
+
+  console.log("===== LED TRANSFORM DEBUG =====");
+  console.log("small:", small);
+  console.log("base:", base);
+  console.log("group world:", groupWorld.toArray());
+  console.log("meshGroup local:", meshGroupRef.current.position.toArray());
+  console.log("meshGroup world:", meshGroupWorld.toArray());
+  console.log("GLB local:", clonedScene.position.toArray());
+  console.log("GLB world:", modelWorld.toArray());
+  console.log("GLB rotation:", clonedScene.rotation.toArray());
+  console.log("GLB scale:", clonedScene.scale.toArray());
+
+  const box = new THREE.Box3().setFromObject(clonedScene);
+  const center = new THREE.Vector3();
+
+  box.getCenter(center);
+
+  console.log("GLB visual center:", center.toArray());
+}, [small, base, clonedScene]);
 
   return (
-    <group
-      ref={group}
-      position={base}
-      scale={1}
-    >
+    <group ref={group} position={base} scale={1}>
+      {/* 1. Malla 3D del LED */}
       <group
         ref={meshGroupRef}
         position={meshOffsetPosition}
@@ -388,17 +259,15 @@ export function LEDModel({
         <primitive object={clonedScene} />
       </group>
 
-      {/* Punto de luz */}
+      {/* 4. Fuentes de Luz */}
       <pointLight
         ref={pointRef}
-        position={[-0.3, 0.5, 0.9]}
+        position={[-0.3, 0.5, 0.9]} //ajustado
         intensity={10000}
         distance={35}
         decay={10}
         color="#00F0FF"
       />
-
-      {/* Spotlight */}
       <spotLight
         ref={spotRef}
         position={spotPosition}
