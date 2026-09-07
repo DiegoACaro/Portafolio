@@ -45,9 +45,15 @@ const config: Config = {
           "0%, 100%": { opacity: "1" },
           "50%": { opacity: "0.78" },
         },
+        blink: {
+          "0%, 45%": { opacity: "1" },
+          "50%, 95%": { opacity: "0" },
+          "100%": { opacity: "1" },
+        },
       },
       animation: {
         "led-breathe": "led-breathe 3.6s ease-in-out infinite",
+        blink: "blink 1.1s step-end infinite",
       },
       transitionTimingFunction: {
         cinematic: "cubic-bezier(0.22, 1, 0.36, 1)",

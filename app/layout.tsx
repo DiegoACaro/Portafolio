@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
-import { SideNav } from "@/components/SideNav";
+import { Navbar } from "@/components/ui/Navbar";
 import { SectionProvider } from "@/context/SectionContext";
 import "./globals.css";
 
@@ -51,11 +51,11 @@ export default function RootLayout({
       <body className="min-h-screen bg-pcb-bg font-sans text-slate-200 antialiased">
         {/*
           SectionProvider expone la seccion activa a toda la app.
-          La escena 3D (BackgroundScene) y el HUD viven en app/page.tsx;
-          cada <section> se registra en el observer via useSectionObserver.
+          La escena 3D (BackgroundScene), el HUD y la intro viven en
+          app/page.tsx; cada <section> se registra en el observer.
         */}
         <SectionProvider>
-          <SideNav />
+          <Navbar />
           {children}
         </SectionProvider>
       </body>

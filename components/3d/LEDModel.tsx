@@ -37,7 +37,18 @@ export function LEDModel({
   const gltf = useGLTF("/rgb_led.glb");
   const clonedScene = useMemo(() => gltf.scene.clone(true), [gltf.scene]);
 
-  const base: [number, number, number] = [3.3, 0.3, 1.8];
+  // const base = useMemo<[number, number, number]>(
+  //   () => (small ? [1.3, 1.35, 2.6] : [3.3, 0.3, 1.8]),
+  //   [small]
+  // );
+
+    const base = useMemo<[number, number, number]>(
+    () => (small ? [1.3, 1.35, 2.6] : [3.3, 0.3, 1.8]),
+    [small]
+  );
+ 
+
+  
   const scale = small ? 0.9 : 0.98;
 
   // Posiciones y rotación del modelo

@@ -2,13 +2,14 @@
 
 /*
 Tipos (GLTFResult) auto-generados por gltfjsx 6.5.3  (npx gltfjsx public/pcb.glb --types).
-Refactor: materiales realistas de PCB + asignacion de material por nombre de nodo.
+Refactor: materiales realistas de PCB + asignacion por nombre de nodo + FUSION de
+geometria por material (560 draw calls -> 5).
 */
 
 import * as THREE from 'three'
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useGLTF } from '@react-three/drei'
-import { GLTF, SkeletonUtils } from 'three-stdlib'
+import { GLTF, SkeletonUtils, mergeBufferGeometries } from 'three-stdlib'
 
 export type GLTFResult = GLTF & {
   nodes: {
@@ -639,36 +640,36 @@ export type PCBMaterialKey = keyof typeof PCB_MATERIALS;
  *                          sufijo numerico -> metalPins
  *    (resto)                                         -> icBody
  * ========================================================================== */
-export function pickPCBMaterial(nodeName: string): THREE.MeshStandardMaterial {
+export function pickPCBMaterialKey(nodeName: string): PCBMaterialKey {
   const n = nodeName.toLowerCase();
 
   // 1 · Sustrato de la placa
-  if (n.includes("board")) return PCB_MATERIALS.board;
+  if (n.includes("board")) return "board";
 
   // 2 · Serigrafia (texto / referencias)
-  if (n.includes("beschriftung") || n.includes("mark")) {
-    return PCB_MATERIALS.silkscreen;
-  }
+  if (n.includes("beschriftung") || n.includes("mark")) return "silkscreen";
 
   // 3 · Metal: pines, terminales, leads, tabs, pads termicos, "Anschluesse"
   if (/pin|terminal|metal|lead|tab|thermal|anschl|contact|solder/.test(n)) {
-    return PCB_MATERIALS.metalPins;
+    return "metalPins";
   }
 
   // 4 · Plastico de conectores JST y portafusibles
-  if (/b[234]b-xh-a|fuse|holder|connector/.test(n)) {
-    return PCB_MATERIALS.connectorPlastic;
-  }
+  if (/b[234]b-xh-a|fuse|holder|connector/.test(n)) return "connectorPlastic";
 
   // 5 · Cuerpos de epoxi (IC, resistencias SMD, transistores)
-  if (/körper|f6rper|body/.test(n)) return PCB_MATERIALS.icBody;
+  if (/körper|f6rper|body/.test(n)) return "icBody";
 
   // 6 · Mallas partidas por gltfjsx (mesh_42 / mesh_42_1 / mesh_42_2 …)
-  if (/^mesh_\d+_\d+$/.test(n)) return PCB_MATERIALS.metalPins;
-  if (/^mesh_\d+$/.test(n)) return PCB_MATERIALS.icBody;
+  if (/^mesh_\d+_\d+$/.test(n)) return "metalPins";
+  if (/^mesh_\d+$/.test(n)) return "icBody";
 
   // 7 · Por defecto: cuerpo oscuro
-  return PCB_MATERIALS.icBody;
+  return "icBody";
+}
+
+export function pickPCBMaterial(nodeName: string): THREE.MeshStandardMaterial {
+  return PCB_MATERIALS[pickPCBMaterialKey(nodeName)];
 }
 
 /**
@@ -684,41 +685,114 @@ export function pickPCBMaterial(nodeName: string): THREE.MeshStandardMaterial {
  */
 
 /* ========================================================================== *
- *  COMPONENTE
- *  Se descarta el JSX mesh-a-mesh que genera gltfjsx (560 mallas): el grafo
- *  del glb ya agrupa y transforma cada componente por su nombre de nodo, asi
- *  que se renderiza tal cual con <primitive> y solo se re-materializa por
- *  nombre. Esto es 1/25 del codigo y trivial de mantener.
- *  `GLTFResult` (arriba) se conserva intacto como tipado/documentacion.
+ *  COMPONENTE  (optimizado)
+ *
+ *  El glb del STEP trae ~560 mallas => ~560 draw calls por frame (mas otras
+ *  tantas en el pase de sombras). Al entrar al sitio eso genera un bajon.
+ *
+ *  Aqui, UNA sola vez al cargar:
+ *   1. se recorre el grafo del glb,
+ *   2. cada geometria se hornea con su transformacion de mundo y se agrupa
+ *      por el material que le toca (pickPCBMaterialKey),
+ *   3. se FUSIONA cada grupo (mergeBufferGeometries) en una unica geometria.
+ *
+ *  Resultado: 5 mallas / 5 draw calls en vez de 560, mismo aspecto.
+ *  `GLTFResult` (arriba) se conserva intacto como tipado / documentacion.
  * ========================================================================== */
+
+const ATTRS_TO_KEEP = new Set(["position", "normal"]);
+
+function bakedGeometry(mesh: THREE.Mesh): THREE.BufferGeometry {
+  const g = mesh.geometry.clone();
+  g.applyMatrix4(mesh.matrixWorld); // hornea la transformacion del nodo
+  if (!g.attributes.normal) g.computeVertexNormals();
+  for (const name of Object.keys(g.attributes)) {
+    if (!ATTRS_TO_KEEP.has(name)) g.deleteAttribute(name);
+  }
+  g.morphAttributes = {};
+  return g;
+}
+
+interface MergedPart {
+  key: PCBMaterialKey;
+  geometry: THREE.BufferGeometry;
+}
+
+function buildMergedParts(scene: THREE.Object3D): MergedPart[] {
+  const root = SkeletonUtils.clone(scene);
+  root.updateMatrixWorld(true);
+
+  const buckets = new Map<PCBMaterialKey, THREE.BufferGeometry[]>();
+  let sourceMeshes = 0;
+  root.traverse((o) => {
+    const mesh = o as THREE.Mesh;
+    if (!mesh.isMesh || !mesh.geometry) return; // ignora camaras del CAD, etc.
+    sourceMeshes++;
+    const key = pickPCBMaterialKey(mesh.name);
+    (buckets.get(key) ?? buckets.set(key, []).get(key)!).push(bakedGeometry(mesh));
+  });
+
+  const parts: MergedPart[] = [];
+  buckets.forEach((geoms, key) => {
+    let merged: THREE.BufferGeometry | null =
+      geoms.length === 1 ? geoms[0] : mergeBufferGeometries(geoms, false);
+
+    // fallback: si algun grupo mezcla indexado/no-indexado, reintenta plano
+    if (!merged && geoms.length > 1) {
+      merged = mergeBufferGeometries(
+        geoms.map((g) => g.toNonIndexed()),
+        false,
+      );
+    }
+    if (!merged) return;
+
+    // libera las geometrias intermedias (no la fusionada)
+    for (const g of geoms) if (g !== merged) g.dispose();
+
+    merged.computeBoundingBox();
+    merged.computeBoundingSphere();
+    parts.push({ key, geometry: merged });
+  });
+
+  if (process.env.NODE_ENV !== "production") {
+    console.info(
+      `[PCB] ${sourceMeshes} mallas del glb -> ${parts.length} tras fusionar por material ` +
+        `(${parts.map((p) => p.key).join(", ")})`,
+    );
+  }
+
+  return parts;
+}
 
 export function PCBModel(props: JSX.IntrinsicElements["group"]) {
   const { scene } = useGLTF("/pcb.glb");
 
-  const model = useMemo(() => {
-    // Clon del grafo: permite instanciar el modelo sin pisar el cache de
-    // useGLTF y deja mutar materiales / sombras con seguridad.
-    const root = SkeletonUtils.clone(scene) as THREE.Group;
+  const parts = useMemo(() => buildMergedParts(scene), [scene]);
 
-    const orphanCameras: THREE.Object3D[] = [];
-    root.traverse((o) => {
-      // Las "vistas guardadas" del CAD llegan como camaras huerfanas: fuera.
-      if ((o as THREE.Camera).isCamera) {
-        orphanCameras.push(o);
-        return;
-      }
-      const mesh = o as THREE.Mesh;
-      if (!mesh.isMesh) return;
-      mesh.material = pickPCBMaterial(mesh.name);
-      mesh.castShadow = true;
-      mesh.receiveShadow = true;
-    });
-    orphanCameras.forEach((c) => c.removeFromParent());
+  // libera las geometrias fusionadas al desmontar
+  useEffect(
+    () => () => {
+      for (const p of parts) p.geometry.dispose();
+    },
+    [parts],
+  );
 
-    return root;
-  }, [scene]);
-
-  return <primitive object={model} {...props} dispose={null} />;
+  return (
+    <group {...props} dispose={null}>
+      {parts.map(({ key, geometry }) => (
+        <mesh
+          key={key}
+          geometry={geometry}
+          material={PCB_MATERIALS[key]}
+          castShadow={key !== "board"}
+          receiveShadow
+          // materiales = singletons de modulo; geometrias las libera el
+          // useEffect de arriba. R3F no debe tocar nada al desmontar.
+          dispose={null}
+        />
+      ))}
+    </group>
+  );
 }
 
 useGLTF.preload("/pcb.glb");

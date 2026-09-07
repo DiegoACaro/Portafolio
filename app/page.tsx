@@ -1,4 +1,5 @@
 import { BackgroundScene } from "@/components/3d/BackgroundScene";
+import { IntroGate } from "@/components/IntroGate";
 import { StatusHUD } from "@/components/StatusHUD";
 import { About } from "@/components/sections/About";
 import { Contact } from "@/components/sections/Contact";
@@ -31,6 +32,9 @@ export default function HomePage() {
 
       {/* lectura textual del estado (esquina inferior derecha) */}
       <StatusHUD />
+
+      {/* pantalla de bienvenida (una vez por sesion) */}
+      <IntroGate />
 
       <main className="relative z-10">
         <Hero />

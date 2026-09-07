@@ -38,6 +38,7 @@
     background-color: theme("colors.pcb.bg");
     color: theme("colors.slate.200");
     text-rendering: optimizeLegibility;
+    overflow-x: hidden;
   }
 
   ::selection {

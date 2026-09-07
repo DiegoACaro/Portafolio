@@ -38,7 +38,7 @@ export function BackgroundScene() {
           vive el texto— y deja respirar la derecha, donde flota el LED 3D.
         - Movil: el contenido ocupa todo el ancho => tinte casi plano mas denso.
       */}
-      <div className="absolute inset-0 hidden bg-[linear-gradient(100deg,rgba(10,13,20,0.92)_0%,rgba(10,13,20,0.78)_34%,rgba(10,13,20,0.45)_58%,rgba(10,13,20,0.12)_82%,transparent_100%)] sm:block" />
+      <div className="absolute inset-0 hidden bg-[linear-gradient(100deg,rgba(10,13,20,0.93)_0%,rgba(10,13,20,0.85)_38%,rgba(10,13,20,0.6)_62%,rgba(10,13,20,0.24)_84%,transparent_100%)] sm:block" />
       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(10,13,20,0.8)_0%,rgba(10,13,20,0.7)_45%,rgba(10,13,20,0.82)_100%)] sm:hidden" />
       <div className="absolute inset-0 bg-[radial-gradient(120%_120%_at_50%_50%,transparent_45%,rgba(5,7,12,0.55)_100%)]" />
       <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-pcb-deep/90 to-transparent" />

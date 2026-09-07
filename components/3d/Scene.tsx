@@ -1,11 +1,21 @@
 "use client";
 
-import { memo, Suspense, useEffect, useMemo, useState } from "react";
-import { Canvas, useThree } from "@react-three/fiber";
+import {
+  memo,
+  Suspense,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type MutableRefObject,
+} from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Environment, Lightformer } from "@react-three/drei";
 import { useReducedMotion } from "framer-motion";
 import * as THREE from "three";
 import { useSectionState } from "@/context/SectionContext";
+import { useScrollProgress } from "@/hooks/useScrollProgress";
+import { emitSceneReady } from "@/lib/sceneReady";
 import { PCBBoard } from "./PCBBoard";
 import { LEDModel } from "./LEDModel";
 
@@ -14,20 +24,20 @@ import { LEDModel } from "./LEDModel";
  * --------------------------------------------------------------------
  * Canvas global de React Three Fiber (fondo, sin interaccion).
  *
- * El estado de seccion se lee AQUI, FUERA del <Canvas> (el contexto de
- * React no cruza el reconciliador de R3F), y se inyecta como prop:
- *   - `colorHex` -> color objetivo del LED y su luz (cambia por seccion)
+ * El estado se lee AQUI, FUERA del <Canvas> (el contexto de React no cruza
+ * el reconciliador de R3F), y se inyecta hacia dentro:
+ *   - `colorHex`  -> color objetivo del LED y su luz (cambia por seccion)
+ *   - `scrollRef` -> progreso 0..1 del scroll (REF): parallax sutil de la PCB
  *
- * La camara es ESTATICA (encuadre fijo por breakpoint). La unica relacion
- * scroll <-> 3D es el color del LED, que responde al cambio de seccion
- * activa (IntersectionObserver), no a la posicion de scroll: mover la
- * camara con el scroll producia shimmer especular/de sombras en las
- * pistas metalicas de la PCB.
+ * La CAMARA es estatica. El parallax de la PCB usa mapeo DIRECTO desde el
+ * ref de scroll (sin easing): se mueve solo mientras haces scroll y queda
+ * inmovil al parar -> sin shimmer residual en las pistas metalicas.
  *
- * Anti-parpadeo: nada re-renderiza en cada frame de scroll (props del
- * <Canvas> constantes, `SceneContents` en `memo`) y NO se usa
+ * Anti-parpadeo: nada re-renderiza en cada frame de scroll (scroll = ref,
+ * props del <Canvas> constantes, `SceneContents` en `memo`) y NO se usa
  * AdaptiveDpr/PerformanceMonitor (cambian el DPR bajo carga -> parpadeo).
  */
+
 
 function hasWebGL(): boolean {
   try {
@@ -78,19 +88,46 @@ const ProceduralEnv = memo(function ProceduralEnv() {
   );
 });
 
+/* ---------------- señal de "escena lista" ---------------- */
+
+/**
+ * Se monta dentro del <Suspense> (solo cuando los glb ya cargaron). Cuenta
+ * 2 frames renderizados de verdad —para que la fusión de la PCB y el primer
+ * pase de sombras ya estén pintados— y avisa a la pantalla de carga.
+ */
+function ReadyBeacon() {
+  const frames = useRef(0);
+  const doneRef = useRef(false);
+  useFrame(() => {
+    if (doneRef.current) return;
+    frames.current += 1;
+    if (frames.current >= 2) {
+      doneRef.current = true;
+      emitSceneReady();
+    }
+  });
+  return null;
+}
+
 /* ---------------- contenido dentro del Canvas ---------------- */
 
 interface ContentsProps {
   colorHex: string;
   reduced: boolean;
+  scrollRef: MutableRefObject<number>;
 }
 
 const SceneContents = memo(function SceneContents({
   colorHex,
   reduced,
+  scrollRef,
 }: ContentsProps) {
   const { camera, size } = useThree();
   const target = useMemo(() => new THREE.Color(colorHex), []); // eslint-disable-line react-hooks/exhaustive-deps
+//   const [small, setSmall] = useState(false);
+//   useEffect(() => {
+//   setSmall(size.width < 768);
+// }, [size.width]);
   const small = size.width < 768;
 
   useEffect(() => {
@@ -120,9 +157,11 @@ const SceneContents = memo(function SceneContents({
 
       <ProceduralEnv />
 
-      {/* la PCB (glb ~2 MB) carga de forma asincrona: aparece al estar lista */}
+      {/* los glb (PCB ~2 MB + LED) cargan async: aparecen juntos al estar listos.
+          ReadyBeacon avisa a la pantalla de carga tras el primer render real. */}
       <Suspense fallback={null}>
-        <PCBBoard />
+        <PCBBoard scrollRef={scrollRef} reduced={reduced} />
+        <ReadyBeacon />
       </Suspense>
       <LEDModel targetColor={target} reduced={reduced} small={small} />
     </>
@@ -135,6 +174,7 @@ export default function Scene() {
   const { active } = useSectionState();
   const prefersReduced = useReducedMotion();
   const reduced = Boolean(prefersReduced);
+  const scrollRef = useScrollProgress();
 
   const [ready, setReady] = useState(false);
   const [supported, setSupported] = useState(true);
@@ -148,6 +188,11 @@ export default function Scene() {
     return () => document.removeEventListener("visibilitychange", onVis);
   }, []);
 
+  // sin WebGL no habra escena 3D -> libera la pantalla de carga igualmente
+  useEffect(() => {
+    if (ready && !supported) emitSceneReady();
+  }, [ready, supported]);
+
   if (!ready || !supported) return null; // el fallback CSS de BackgroundScene queda visible
 
   return (
@@ -160,7 +205,11 @@ export default function Scene() {
       camera={CAMERA_PROPS}
       onCreated={handleCreated}
     >
-      <SceneContents colorHex={active.color} reduced={reduced} />
+      <SceneContents
+        colorHex={active.color}
+        reduced={reduced}
+        scrollRef={scrollRef}
+      />
     </Canvas>
   );
 }

@@ -1,104 +1,95 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 import { SectionShell } from "@/components/sections/SectionShell";
+import { SectionLabel } from "@/components/ui/SectionLabel";
+import { RotatingText } from "@/components/ui/RotatingText";
 import { Chip } from "@/components/ui/Chip";
 
-/* Lineas del "log de arranque" del sistema. */
-const BOOT_LOG = [
-  "› init core.mecatronica ......... OK",
-  "› load models/ia ............... OK",
-  "› link firmware <-> backend .... OK",
-  "› status: SYSTEM READY",
+const SKILLS = ["TypeScript", "Python", "PyTorch", "STM32 · ESP32", "ROS 2", "Next.js"];
+
+const ROLES = [
+  "Ingeniero Mecatrónico",
+  "Desarrollador de Software e IA",
+  "Del sensor al usuario",
 ];
+
+const ease: [number, number, number, number] = [0.22, 1, 0.36, 1];
+
+const fadeUp: Variants = {
+  hidden: { opacity: 0, y: 32, filter: "blur(10px)" },
+  show: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.9, ease } },
+};
 
 export function Hero() {
   return (
-    <SectionShell id="hero" eyebrow="01 // INICIO">
-      <div className="grid gap-12 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
-        {/* --- Columna principal --- */}
-        <div>
-          <div className="mb-6 flex flex-wrap gap-2">
-            <Chip accent>Software / IA</Chip>
-            <Chip accent>Ingenieria Mecatronica</Chip>
-          </div>
-
-          <h1 className="text-4xl font-semibold leading-[1.05] tracking-tight text-white sm:text-6xl">
-            Construyo sistemas donde el{" "}
-            <span className="text-[var(--section)]">codigo</span> y el{" "}
-            <span className="text-[var(--section)]">hardware</span> piensan juntos.
-          </h1>
-
-          <p className="mt-6 max-w-xl text-base leading-relaxed text-slate-400 sm:text-lg">
-            Tu Nombre — desarrollador de software e IA e ingeniero mecatronico.
-            Diseno desde el firmware y el control de planta hasta el modelo, la
-            API y la interfaz. Un unico flujo, del sensor al usuario.
-          </p>
-
-          <div className="mt-9 flex flex-wrap items-center gap-4">
-            <a
-              href="#projects"
-              className="group inline-flex items-center gap-2 rounded-lg bg-[var(--section)] px-5 py-3 text-sm font-semibold text-pcb-deep transition-transform duration-200 hover:-translate-y-0.5"
-            >
-              Ver proyectos
-              <span className="transition-transform duration-200 group-hover:translate-x-0.5">
-                →
-              </span>
-            </a>
-            <a
-              href="#contact"
-              className="inline-flex items-center gap-2 rounded-lg border border-white/15 px-5 py-3 text-sm font-medium text-slate-200 transition-colors duration-200 hover:border-white/35 hover:bg-white/[0.04]"
-            >
-              Hablemos
-            </a>
-          </div>
-        </div>
-
-        {/* --- Panel: log de arranque --- */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.96 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-          className="panel-pcb rounded-2xl p-1"
-        >
-          <div className="rounded-xl bg-pcb-deep/70 p-5">
-            <div className="mb-4 flex items-center gap-2">
-              <span className="h-2.5 w-2.5 rounded-full bg-[var(--section)] shadow-[0_0_10px_2px_rgba(var(--section-rgb),0.7)]" />
-              <span className="silkscreen text-[10px] text-white/40">
-                boot.sequence
-              </span>
-            </div>
-            <pre className="whitespace-pre-wrap font-mono text-[12.5px] leading-6 text-slate-400">
-              {BOOT_LOG.map((line, i) => (
-                <motion.span
-                  key={line}
-                  className="block"
-                  initial={{ opacity: 0, x: -8 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.35, delay: 0.4 + i * 0.18 }}
-                >
-                  {line.includes("SYSTEM READY") ? (
-                    <span className="text-[var(--section)]">{line}</span>
-                  ) : (
-                    line
-                  )}
-                </motion.span>
-              ))}
-            </pre>
-          </div>
-        </motion.div>
-      </div>
-
-      {/* Hint de scroll */}
+    <SectionShell
+      id="hero"
+      className="overflow-hidden px-6 py-28 sm:px-12 md:pl-24 lg:pl-32"
+    >
       <motion.div
-        className="mt-16 flex items-center gap-3 text-white/30"
-        animate={{ y: [0, 6, 0] }}
-        transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+        initial="hidden"
+        animate="show"
+        variants={{ hidden: {}, show: { transition: { staggerChildren: 0.14 } } }}
+        className="w-full max-w-xl"
       >
-        <span className="silkscreen text-[10px]">scroll</span>
-        <span className="h-8 w-px bg-gradient-to-b from-white/30 to-transparent" />
+        <motion.div variants={fadeUp} className="mb-6">
+          <SectionLabel>✦ Disponible para proyectos</SectionLabel>
+        </motion.div>
+
+        <motion.h1
+          variants={fadeUp}
+          className="text-[clamp(34px,6vw,64px)] font-extrabold leading-[1.03] tracking-[-0.03em] text-white"
+        >
+          Diego Alejandro
+          <span className="block text-[var(--section)]">Caro</span>
+        </motion.h1>
+
+        <motion.div
+          variants={fadeUp}
+          className="mt-4 text-[15px] tracking-[0.06em] text-slate-400"
+        >
+          <RotatingText phrases={ROLES} />
+        </motion.div>
+
+        <motion.p
+          variants={fadeUp}
+          className="mt-7 max-w-md text-[14px] leading-[1.9] text-slate-400"
+        >
+          Diseño el flujo completo: firmware y control de planta, el modelo de
+          IA, la API y la interfaz. Sistemas donde el código y el hardware
+          piensan juntos.
+        </motion.p>
+
+        <motion.div variants={fadeUp} className="mt-7 flex flex-wrap gap-2">
+          {SKILLS.map((skill) => (
+            <Chip key={skill}>{skill}</Chip>
+          ))}
+        </motion.div>
+
+        <motion.div
+          variants={fadeUp}
+          className="mt-8 flex flex-col gap-1.5 font-mono text-[13px] text-slate-500"
+        >
+          <span>↓ explora mi trabajo abajo</span>
+          <span>↗ abierto a roles híbridos y colaboraciones de I+D</span>
+        </motion.div>
+      </motion.div>
+
+      {/* indicador de scroll */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.1, duration: 0.8 }}
+        className="pointer-events-none absolute inset-x-0 bottom-8 flex justify-center"
+      >
+        <motion.div
+          animate={{ y: [0, 6, 0], opacity: [1, 0.6, 1] }}
+          transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+          className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.25em] text-slate-500"
+        >
+          Scroll <span className="text-slate-300">↓</span>
+        </motion.div>
       </motion.div>
     </SectionShell>
   );
