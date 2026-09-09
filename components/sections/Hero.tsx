@@ -31,7 +31,7 @@ export function Hero() {
         initial="hidden"
         animate="show"
         variants={{ hidden: {}, show: { transition: { staggerChildren: 0.14 } } }}
-        className="w-full max-w-xl"
+        className="w-full max-w-3xl"
       >
         <motion.div variants={fadeUp} className="mb-6">
           <SectionLabel>✦ Disponible para proyectos</SectionLabel>
@@ -41,8 +41,8 @@ export function Hero() {
           variants={fadeUp}
           className="text-[clamp(34px,6vw,64px)] font-extrabold leading-[1.03] tracking-[-0.03em] text-white"
         >
-          Diego Alejandro
-          <span className="block text-[var(--section)]">Caro</span>
+          Diego Alejandro Caro
+          <span className="block text-[var(--section)]">Ingeniero Mecatrónico</span>
         </motion.h1>
 
         <motion.div
@@ -56,9 +56,7 @@ export function Hero() {
           variants={fadeUp}
           className="mt-7 max-w-md text-[14px] leading-[1.9] text-slate-400"
         >
-          Diseño el flujo completo: firmware y control de planta, el modelo de
-          IA, la API y la interfaz. Sistemas donde el código y el hardware
-          piensan juntos.
+          Especializado en automatización industrial y robótica. Cuento con experiencia en el diseño e implementación de soluciones integradas de hardware y software. 
         </motion.p>
 
         <motion.div variants={fadeUp} className="mt-7 flex flex-wrap gap-2">

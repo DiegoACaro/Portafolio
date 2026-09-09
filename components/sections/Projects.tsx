@@ -3,6 +3,14 @@
 import { useState } from "react";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
 import { ArrowUpRight, Cpu, CircuitBoard, Layers } from "lucide-react";
+import type { IconType } from "react-icons";
+import {
+  SiC,
+  SiCplusplus,
+  SiJavascript,
+  SiPython,
+  SiTypescript,
+} from "react-icons/si";
 import { SectionShell } from "@/components/sections/SectionShell";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { GlassCard } from "@/components/ui/GlassCard";
@@ -10,14 +18,20 @@ import { Chip } from "@/components/ui/Chip";
 
 const ease: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
-const cardIn: Variants = {
-  hidden: { opacity: 0, y: 40, scale: 0.96 },
-  show: (i: number) => ({
+/** Contenedor que orquesta el stagger de sus hijos al montarse (cambio de tab). */
+const grid: Variants = {
+  hidden: { opacity: 0, y: 24 },
+  show: {
     opacity: 1,
     y: 0,
-    scale: 1,
-    transition: { duration: 0.55, delay: i * 0.05, ease },
-  }),
+    transition: { duration: 0.35, ease, staggerChildren: 0.06 },
+  },
+  exit: { opacity: 0, y: -16, transition: { duration: 0.3 } },
+};
+
+const cardIn: Variants = {
+  hidden: { opacity: 0, y: 40, scale: 0.96 },
+  show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.5, ease } },
 };
 
 /* ---------------- datos ---------------- */
@@ -35,18 +49,18 @@ interface Project {
 
 const PROJECTS: Project[] = [
   {
-    name: "Celda de inspección con visión + IA",
-    kind: "HÍBRIDO",
+    name: "App de servicios aduaneros con IA integrada",
+    kind: "SOFTWARE",
     summary:
-      "Control de calidad de línea: cámara industrial, modelo de detección de defectos en el edge y dashboard de trazabilidad en tiempo real.",
-    stack: ["ESP32-CAM", "PyTorch", "ONNX Runtime", "Next.js", "MQTT"],
-    metric: "−38% falsos rechazos",
+      "Plataforma B2C con IA, casillero virtual y KYC que evalúa la viabilidad e impuestos de envíos internacionales bajo auditoría humana.",
+    stack: ["React", "TypeScript", "Vite", "Tailwind CSS", "IA / LLMs", "PostgreSQL (RLS)", "Supabase"],
+    metric: "",
   },
   {
-    name: "Brazo robótico teleoperado",
-    kind: "HARDWARE",
+    name: "Plataforma robótica con cambios de locomoción y redes neuronales biológicamente inspiradas",
+    kind: "HÍBRIDO",
     summary:
-      "Manipulador de 5 GDL con control PID en STM32, cinemática inversa y telemetría vía CAN. Puesta a punto con testing HIL.",
+      "",
     stack: ["STM32", "C++", "ROS 2", "CAN bus"],
     metric: "±0.4 mm de repetibilidad",
   },
@@ -58,14 +72,6 @@ const PROJECTS: Project[] = [
     stack: ["TypeScript", "Next.js", "pgvector", "LLM APIs"],
     metric: "92% respuestas con cita válida",
   },
-  {
-    name: "Gemelo digital de planta HVAC",
-    kind: "HÍBRIDO",
-    summary:
-      "Simulación en vivo alimentada por sensores Modbus; predice consumo y anticipa fallos con una ventana de 6 h.",
-    stack: ["Python", "FastAPI", "Modbus", "Three.js"],
-    metric: "−17% consumo energético",
-  },
 ];
 
 const KIND_ICON: Record<Kind, typeof Cpu> = {
@@ -74,27 +80,18 @@ const KIND_ICON: Record<Kind, typeof Cpu> = {
   HARDWARE: Layers,
 };
 
-const STACK_GROUPS: { title: string; role: string; items: string[] }[] = [
-  {
-    title: "Software / IA",
-    role: "U1 · Compute",
-    items: ["TypeScript", "Python", "Next.js / React", "PyTorch", "RAG / LLMs", "APIs & Cloud"],
-  },
-  {
-    title: "Mecatrónica",
-    role: "U2 · Actuation",
-    items: ["C / C++ embebido", "STM32 · ESP32", "Control PID", "ROS 2", "Visión artificial", "CAD / CAM"],
-  },
-  {
-    title: "Integración",
-    role: "U3 · Bus",
-    items: ["MQTT · CAN · Modbus", "Edge computing", "Gemelos digitales", "CI/CD", "Telemetría", "Testing HIL"],
-  },
+/** Lenguajes de programación (logo + color de marca). */
+const LANGUAGES: { name: string; Icon: IconType; color: string }[] = [
+  { name: "TypeScript", Icon: SiTypescript, color: "#3178C6" },
+  { name: "JavaScript", Icon: SiJavascript, color: "#F7DF1E" },
+  { name: "Python", Icon: SiPython, color: "#3776AB" },
+  { name: "C++", Icon: SiCplusplus, color: "#00599C" },
+  { name: "C", Icon: SiC, color: "#A8B9CC" },
 ];
 
 const TABS = [
   { id: "projects", label: "Proyectos" },
-  { id: "stack", label: "Stack técnico" },
+  { id: "languages", label: "Lenguajes" },
 ] as const;
 
 /* ---------------- componente ---------------- */
@@ -119,12 +116,12 @@ export function Projects() {
         >
           <SectionLabel className="mb-4">Portafolio</SectionLabel>
           <h2 className="text-[clamp(28px,4.5vw,46px)] font-extrabold tracking-[-0.03em] text-white">
-            Carga de trabajo{" "}
-            <span className="text-[var(--section)]">{"// output"}</span>
+            Mis{" "}
+            <span className="text-[var(--section)]">{"Proyectos"}</span>
           </h2>
-          <p className="mt-3 max-w-md text-[14px] text-slate-400">
+          {/* <p className="mt-3 max-w-md text-[14px] text-slate-400">
             Sistemas donde software, IA y mecatrónica operan como una sola pieza.
-          </p>
+          </p> */}
         </motion.div>
 
         {/* tabs */}
@@ -158,10 +155,10 @@ export function Projects() {
             {tab === "projects" ? (
               <motion.div
                 key="projects"
-                initial={{ opacity: 0, y: 24 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -16 }}
-                transition={{ duration: 0.4 }}
+                variants={grid}
+                initial="hidden"
+                animate="show"
+                exit="exit"
                 className="grid gap-6 md:grid-cols-2 xl:grid-cols-3"
               >
                 {PROJECTS.map((project, i) => {
@@ -169,11 +166,7 @@ export function Projects() {
                   return (
                     <motion.div
                       key={project.name}
-                      custom={i}
                       variants={cardIn}
-                      initial="hidden"
-                      whileInView="show"
-                      viewport={{ once: true }}
                       whileHover={{ y: -4 }}
                     >
                       <GlassCard interactive className="flex h-full flex-col p-4">
@@ -223,37 +216,36 @@ export function Projects() {
               </motion.div>
             ) : (
               <motion.div
-                key="stack"
-                initial={{ opacity: 0, y: 24 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -16 }}
-                transition={{ duration: 0.4 }}
-                className="grid gap-6 md:grid-cols-3"
+                key="languages"
+                variants={grid}
+                initial="hidden"
+                animate="show"
+                exit="exit"
+                className="mx-auto grid max-w-3xl grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-5"
               >
-                {STACK_GROUPS.map((group, i) => (
+                {LANGUAGES.map(({ name, Icon, color }) => (
                   <motion.div
-                    key={group.title}
-                    custom={i}
+                    key={name}
                     variants={cardIn}
-                    initial="hidden"
-                    whileInView="show"
-                    viewport={{ once: true }}
+                    whileHover={{ y: -5, scale: 1.04 }}
+                    className="group flex flex-col items-center justify-center gap-3 rounded-[24px] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl transition-colors hover:border-white/20"
                   >
-                    <GlassCard className="h-full p-5">
-                      <div className="mb-3 flex items-center justify-between">
-                        <h3 className="text-[15px] font-semibold text-white">
-                          {group.title}
-                        </h3>
-                        <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-slate-500">
-                          {group.role}
-                        </span>
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        {group.items.map((item) => (
-                          <Chip key={item}>{item}</Chip>
-                        ))}
-                      </div>
-                    </GlassCard>
+                    <span className="relative flex items-center justify-center">
+                      <span
+                        aria-hidden
+                        className="pointer-events-none absolute h-12 w-12 rounded-full opacity-20 blur-xl transition-opacity duration-500 group-hover:opacity-70"
+                        style={{ background: color }}
+                      />
+                      <Icon
+                        size={42}
+                        style={{ color }}
+                        className="relative z-10"
+                        aria-label={name}
+                      />
+                    </span>
+                    <span className="text-[13px] font-medium text-slate-200">
+                      {name}
+                    </span>
                   </motion.div>
                 ))}
               </motion.div>

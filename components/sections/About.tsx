@@ -57,8 +57,7 @@ export function About() {
               variants={fadeUp}
               className="text-[clamp(30px,5vw,46px)] font-extrabold leading-[1.03] tracking-[-0.03em] text-white"
             >
-              Un núcleo operativo
-              <span className="block text-[var(--section)]">entre dos disciplinas</span>
+              Mi{" "} <span className="text-[var(--section)]">Perfil</span>
             </motion.h2>
 
             <motion.p
