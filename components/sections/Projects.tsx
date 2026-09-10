@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
-import { ArrowUpRight, Cpu, CircuitBoard, Layers } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import type { IconType } from "react-icons";
 import {
   SiC,
@@ -13,8 +14,9 @@ import {
 } from "react-icons/si";
 import { SectionShell } from "@/components/sections/SectionShell";
 import { SectionLabel } from "@/components/ui/SectionLabel";
-import { GlassCard } from "@/components/ui/GlassCard";
-import { Chip } from "@/components/ui/Chip";
+import { ProjectCard } from "@/components/ui/ProjectCard";
+import { CertificateGallery } from "@/components/ui/CertificateGallery";
+import { FEATURED_PROJECTS } from "@/lib/projects";
 
 const ease: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -34,52 +36,6 @@ const cardIn: Variants = {
   show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.5, ease } },
 };
 
-/* ---------------- datos ---------------- */
-
-type Kind = "HÍBRIDO" | "SOFTWARE" | "HARDWARE";
-
-interface Project {
-  name: string;
-  kind: Kind;
-  summary: string;
-  stack: string[];
-  metric: string;
-  href?: string;
-}
-
-const PROJECTS: Project[] = [
-  {
-    name: "App de servicios aduaneros con IA integrada",
-    kind: "SOFTWARE",
-    summary:
-      "Plataforma B2C con IA, casillero virtual y KYC que evalúa la viabilidad e impuestos de envíos internacionales bajo auditoría humana.",
-    stack: ["React", "TypeScript", "Vite", "Tailwind CSS", "IA / LLMs", "PostgreSQL (RLS)", "Supabase"],
-    metric: "",
-  },
-  {
-    name: "Plataforma robótica con cambios de locomoción y redes neuronales biológicamente inspiradas",
-    kind: "HÍBRIDO",
-    summary:
-      "",
-    stack: ["STM32", "C++", "ROS 2", "CAN bus"],
-    metric: "±0.4 mm de repetibilidad",
-  },
-  {
-    name: "Copiloto documental RAG",
-    kind: "SOFTWARE",
-    summary:
-      "Asistente que responde sobre manuales técnicos con citas verificables. Ingesta, embeddings, reranking y evaluación continua.",
-    stack: ["TypeScript", "Next.js", "pgvector", "LLM APIs"],
-    metric: "92% respuestas con cita válida",
-  },
-];
-
-const KIND_ICON: Record<Kind, typeof Cpu> = {
-  HÍBRIDO: CircuitBoard,
-  SOFTWARE: Cpu,
-  HARDWARE: Layers,
-};
-
 /** Lenguajes de programación (logo + color de marca). */
 const LANGUAGES: { name: string; Icon: IconType; color: string }[] = [
   { name: "TypeScript", Icon: SiTypescript, color: "#3178C6" },
@@ -91,7 +47,8 @@ const LANGUAGES: { name: string; Icon: IconType; color: string }[] = [
 
 const TABS = [
   { id: "projects", label: "Proyectos" },
-  { id: "languages", label: "Lenguajes" },
+  { id: "languages", label: "Stack" },
+  { id: "certifications", label: "Certificaciones" },
 ] as const;
 
 /* ---------------- componente ---------------- */
@@ -116,12 +73,8 @@ export function Projects() {
         >
           <SectionLabel className="mb-4">Portafolio</SectionLabel>
           <h2 className="text-[clamp(28px,4.5vw,46px)] font-extrabold tracking-[-0.03em] text-white">
-            Mis{" "}
-            <span className="text-[var(--section)]">{"Proyectos"}</span>
+            Mis <span className="text-[var(--section)]">Proyectos</span>
           </h2>
-          {/* <p className="mt-3 max-w-md text-[14px] text-slate-400">
-            Sistemas donde software, IA y mecatrónica operan como una sola pieza.
-          </p> */}
         </motion.div>
 
         {/* tabs */}
@@ -152,7 +105,7 @@ export function Projects() {
         {/* contenido */}
         <div className="mt-10">
           <AnimatePresence mode="wait">
-            {tab === "projects" ? (
+            {tab === "projects" && (
               <motion.div
                 key="projects"
                 variants={grid}
@@ -161,60 +114,38 @@ export function Projects() {
                 exit="exit"
                 className="grid gap-6 md:grid-cols-2 xl:grid-cols-3"
               >
-                {PROJECTS.map((project, i) => {
-                  const Icon = KIND_ICON[project.kind];
-                  return (
-                    <motion.div
-                      key={project.name}
-                      variants={cardIn}
-                      whileHover={{ y: -4 }}
-                    >
-                      <GlassCard interactive className="flex h-full flex-col p-4">
-                        {/* cabecera visual */}
-                        <div className="relative mb-4 flex h-32 items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-[radial-gradient(120%_120%_at_20%_0%,rgba(var(--section-rgb),0.16),transparent_60%)]">
-                          <Icon size={30} className="text-[var(--section)] opacity-70" />
-                          <span className="absolute left-3 top-3 rounded-md border border-[rgba(var(--section-rgb),0.4)] px-2 py-0.5 font-mono text-[10px] tracking-widest text-[var(--section)]">
-                            {project.kind}
-                          </span>
-                          <span className="absolute right-3 top-3 font-mono text-[11px] text-slate-500">
-                            {String(i + 1).padStart(2, "0")}
-                          </span>
-                        </div>
+                {FEATURED_PROJECTS.map((project, i) => (
+                  <motion.div
+                    key={project.slug}
+                    variants={cardIn}
+                    whileHover={{ y: -4 }}
+                  >
+                    <ProjectCard project={project} index={i} />
+                  </motion.div>
+                ))}
 
-                        <h3 className="text-[16px] font-semibold leading-tight text-white">
-                          {project.name}
-                        </h3>
-                        <p className="mt-2 line-clamp-3 flex-1 text-[13px] leading-relaxed text-slate-400">
-                          {project.summary}
-                        </p>
-
-                        <div className="mt-3 flex flex-wrap gap-1.5">
-                          {project.stack.map((tech) => (
-                            <Chip key={tech}>{tech}</Chip>
-                          ))}
-                        </div>
-
-                        <div className="mt-4 flex items-center justify-between border-t border-white/5 pt-3">
-                          <span className="text-[13px] font-medium text-[var(--section)]">
-                            {project.metric}
-                          </span>
-                          {project.href && (
-                            <a
-                              href={project.href}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex items-center gap-1 text-[12px] text-slate-400 transition-colors hover:text-white"
-                            >
-                              Ver <ArrowUpRight size={13} />
-                            </a>
-                          )}
-                        </div>
-                      </GlassCard>
-                    </motion.div>
-                  );
-                })}
+                {/* CTA: una celda más de la grid, con el mismo ancho que una
+                    card de proyecto. En desktop (3 col) va bajo la 2.ª card. */}
+                <motion.div
+                  variants={cardIn}
+                  whileHover={{ y: -4 }}
+                  className="xl:col-start-2"
+                >
+                  <Link
+                    href="/proyectos"
+                    className="group flex h-full min-h-[3.5rem] w-full items-center justify-center gap-2 rounded-xl bg-[var(--section)] px-6 py-4 text-center text-[14px] font-semibold text-pcb-deep shadow-[0_14px_36px_-12px_rgba(var(--section-rgb),0.75)]"
+                  >
+                    Ver todos los proyectos
+                    <ArrowRight
+                      size={16}
+                      className="transition-transform group-hover:translate-x-0.5"
+                    />
+                  </Link>
+                </motion.div>
               </motion.div>
-            ) : (
+            )}
+
+            {tab === "languages" && (
               <motion.div
                 key="languages"
                 variants={grid}
@@ -248,6 +179,18 @@ export function Projects() {
                     </span>
                   </motion.div>
                 ))}
+              </motion.div>
+            )}
+
+            {tab === "certifications" && (
+              <motion.div
+                key="certifications"
+                initial={{ opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -16 }}
+                transition={{ duration: 0.35, ease }}
+              >
+                <CertificateGallery />
               </motion.div>
             )}
           </AnimatePresence>

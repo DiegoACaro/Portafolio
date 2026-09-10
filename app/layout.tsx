@@ -17,7 +17,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Portafolio · Software / IA × Mecatronica",
+  title: "Portafolio · Diego A Caro",
   description:
     "Portafolio profesional hibrido: desarrollo de software e IA e ingenieria mecatronica. Escena 3D en tiempo real (React Three Fiber) con un LED que ilumina una PCB.",
   keywords: [

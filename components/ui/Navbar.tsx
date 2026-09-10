@@ -1,20 +1,33 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { useSectionState } from "@/context/SectionContext";
-import { SECTIONS } from "@/lib/sections";
+import { SECTIONS, SECTION_MAP, type SectionId } from "@/lib/sections";
 
 /**
  * Navbar tipo pildora (estructura del Template) adaptada al proyecto:
- * la seccion activa y su color salen de `useSectionState()` — el mismo
- * estado que pinta el LED 3D del fondo. Reemplaza al antiguo SideNav.
+ * en la home la seccion activa y su color salen de `useSectionState()` — el
+ * mismo estado que pinta el LED 3D del fondo. Fuera de la home (p. ej.
+ * `/proyectos`) los enlaces apuntan a `/#seccion` y no hay scroll-spy.
  */
 export function Navbar() {
   const { activeId, active } = useSectionState();
+  const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+
+  const onHome = pathname === "/";
+  // Qué item resaltar: en la home lo dice el observer; en /proyectos, "Proyectos".
+  const currentId: SectionId | null = onHome
+    ? activeId
+    : pathname.startsWith("/proyectos")
+      ? "projects"
+      : null;
+  const accent = currentId ? SECTION_MAP[currentId].color : active.color;
+  const hrefFor = (id: SectionId) => (onHome ? `#${id}` : `/#${id}`);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -39,20 +52,20 @@ export function Navbar() {
         }`}
       >
         <a
-          href="#hero"
+          href={onHome ? "#hero" : "/"}
           className="font-mono text-[13px] tracking-[0.12em] text-slate-300 transition-colors hover:text-white"
         >
-          diego<span style={{ color: active.color }}>.</span>caro
+          diego<span style={{ color: accent }}>.</span>caro
         </a>
 
         {/* desktop */}
         <div className="hidden items-center gap-8 md:flex">
           {SECTIONS.map((section) => {
-            const isActive = section.id === activeId;
+            const isActive = section.id === currentId;
             return (
               <a
                 key={section.id}
-                href={`#${section.id}`}
+                href={hrefFor(section.id)}
                 aria-current={isActive ? "true" : undefined}
                 className={`relative pb-1 font-mono text-[13px] tracking-[0.08em] transition-colors duration-200 ${
                   isActive ? "text-white" : "text-slate-400 hover:text-slate-200"
@@ -93,11 +106,11 @@ export function Navbar() {
             className="mt-2 flex flex-col gap-1 rounded-3xl border border-white/10 bg-pcb-bg/90 p-3 backdrop-blur-xl md:hidden"
           >
             {SECTIONS.map((section) => {
-              const isActive = section.id === activeId;
+              const isActive = section.id === currentId;
               return (
                 <a
                   key={section.id}
-                  href={`#${section.id}`}
+                  href={hrefFor(section.id)}
                   onClick={() => setOpen(false)}
                   className={`flex items-center gap-3 rounded-2xl px-4 py-3 font-mono text-[13px] tracking-[0.08em] ${
                     isActive ? "bg-white/[0.06] text-white" : "text-slate-400"

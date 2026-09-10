@@ -9,8 +9,8 @@ import { Chip } from "@/components/ui/Chip";
 const SKILLS = ["TypeScript", "Python", "PyTorch", "STM32 · ESP32", "ROS 2", "Next.js"];
 
 const ROLES = [
-  "Ingeniero Mecatrónico",
-  "Desarrollador de Software e IA",
+  "Automatomatización Industrial",
+  "Desarrollador de Software",
   "Del sensor al usuario",
 ];
 
