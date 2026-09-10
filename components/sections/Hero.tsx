@@ -5,6 +5,12 @@ import { SectionShell } from "@/components/sections/SectionShell";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { RotatingText } from "@/components/ui/RotatingText";
 import { Chip } from "@/components/ui/Chip";
+import { Space_Grotesk } from "next/font/google";
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  weight: ["400", "300"],
+});
 
 const SKILLS = ["TypeScript", "Python", "PyTorch", "STM32 · ESP32", "ROS 2", "Next.js"];
 
@@ -37,12 +43,21 @@ export function Hero() {
           <SectionLabel>✦ Disponible para proyectos</SectionLabel>
         </motion.div>
 
-        <motion.h1
+        {/* <motion.h1
           variants={fadeUp}
           className="text-[clamp(34px,6vw,64px)] font-extrabold leading-[1.03] tracking-[-0.03em] text-white"
         >
           Diego Alejandro Caro
           <span className="block text-[var(--section)]">Ingeniero Mecatrónico</span>
+        </motion.h1> */}
+        <motion.h1
+          variants={fadeUp}
+          className="text-[clamp(34px,6vw,64px)] font-extrabold leading-[1.03] tracking-[-0.03em] text-white"
+        >
+          Diego Alejandro Caro
+          <span className={`${spaceGrotesk.className} block text-[clamp(28px,5vw,61px)] text-[var(--section)]`}>
+            Ingeniero Mecatrónico
+          </span>
         </motion.h1>
 
         <motion.div
