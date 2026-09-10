@@ -1,16 +1,38 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ComponentType, type CSSProperties } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
-import { ArrowRight } from "lucide-react";
-import type { IconType } from "react-icons";
 import {
-  SiC,
-  SiCplusplus,
-  SiJavascript,
-  SiPython,
+  ArrowRight,
+  Database,
+  MonitorSmartphone,
+  ShieldCheck,
+  Sparkles,
+  Webhook,
+} from "lucide-react";
+import {
+  SiAndroid,
+  SiCss,
+  SiFigma,
+  SiGit,
+  SiGithub,
+  SiHtml5,
+  SiJetpackcompose,
+  SiKotlin,
+  SiLaravel,
+  SiLinux,
+  SiMysql,
+  SiNodedotjs,
+  SiPhp,
+  SiPostgresql,
+  SiReact,
+  SiReactquery,
+  SiSupabase,
+  SiTailwindcss,
   SiTypescript,
+  SiVercel,
+  SiVite,
 } from "react-icons/si";
 import { SectionShell } from "@/components/sections/SectionShell";
 import { SectionLabel } from "@/components/ui/SectionLabel";
@@ -36,13 +58,67 @@ const cardIn: Variants = {
   show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.5, ease } },
 };
 
-/** Lenguajes de programación (logo + color de marca). */
-const LANGUAGES: { name: string; Icon: IconType; color: string }[] = [
-  { name: "TypeScript", Icon: SiTypescript, color: "#3178C6" },
-  { name: "JavaScript", Icon: SiJavascript, color: "#F7DF1E" },
-  { name: "Python", Icon: SiPython, color: "#3776AB" },
-  { name: "C++", Icon: SiCplusplus, color: "#00599C" },
-  { name: "C", Icon: SiC, color: "#A8B9CC" },
+type StackIcon = ComponentType<{
+  size?: number | string;
+  className?: string;
+  style?: CSSProperties;
+}>;
+
+/** Color de la sección: lo usan las herramientas sin logo de marca propio. */
+const ACCENT = "var(--section)";
+
+/**
+ * Stack técnico agrupado por categoría (logo + color de marca). Las entradas
+ * sin marca propia — diseño responsive, APIs REST, auth, etc. — usan un icono
+ * de lucide teñido con el acento de la sección.
+ */
+const STACK: { category: string; items: { name: string; Icon: StackIcon; color: string }[] }[] = [
+  {
+    category: "Frontend",
+    items: [
+      { name: "React", Icon: SiReact, color: "#61DAFB" },
+      { name: "TypeScript", Icon: SiTypescript, color: "#3178C6" },
+      { name: "Tailwind CSS", Icon: SiTailwindcss, color: "#38BDF8" },
+      { name: "Vite", Icon: SiVite, color: "#646CFF" },
+      { name: "React Query", Icon: SiReactquery, color: "#FF4154" },
+      { name: "HTML5", Icon: SiHtml5, color: "#E34F26" },
+      { name: "CSS", Icon: SiCss, color: "#1572B6" },
+      { name: "Diseño responsive", Icon: MonitorSmartphone, color: ACCENT },
+    ],
+  },
+  {
+    category: "Backend & datos",
+    items: [
+      { name: "PHP", Icon: SiPhp, color: "#777BB4" },
+      { name: "Laravel", Icon: SiLaravel, color: "#FF2D20" },
+      { name: "Node.js", Icon: SiNodedotjs, color: "#5FA04E" },
+      { name: "Supabase", Icon: SiSupabase, color: "#3ECF8E" },
+      { name: "PostgreSQL", Icon: SiPostgresql, color: "#4169E1" },
+      { name: "MySQL", Icon: SiMysql, color: "#4479A1" },
+      { name: "APIs REST", Icon: Webhook, color: ACCENT },
+      { name: "Auth / RLS", Icon: ShieldCheck, color: ACCENT },
+    ],
+  },
+  {
+    category: "Móvil",
+    items: [
+      { name: "Kotlin", Icon: SiKotlin, color: "#7F52FF" },
+      { name: "Android", Icon: SiAndroid, color: "#3DDC84" },
+      { name: "Jetpack Compose", Icon: SiJetpackcompose, color: "#4285F4" },
+      { name: "Room", Icon: Database, color: ACCENT },
+    ],
+  },
+  {
+    category: "Herramientas",
+    items: [
+      { name: "Git", Icon: SiGit, color: "#F05032" },
+      { name: "GitHub", Icon: SiGithub, color: "#FFFFFF" },
+      { name: "Figma", Icon: SiFigma, color: "#F24E1E" },
+      { name: "Vercel", Icon: SiVercel, color: "#FFFFFF" },
+      { name: "Linux", Icon: SiLinux, color: "#FCC624" },
+      { name: "IA / LLMs", Icon: Sparkles, color: ACCENT },
+    ],
+  },
 ];
 
 const TABS = [
@@ -148,36 +224,47 @@ export function Projects() {
             {tab === "languages" && (
               <motion.div
                 key="languages"
-                variants={grid}
-                initial="hidden"
-                animate="show"
-                exit="exit"
-                className="mx-auto grid max-w-3xl grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-5"
+                initial={{ opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -16 }}
+                transition={{ duration: 0.35, ease }}
+                className="mx-auto max-w-3xl space-y-8"
               >
-                {LANGUAGES.map(({ name, Icon, color }) => (
-                  <motion.div
-                    key={name}
-                    variants={cardIn}
-                    whileHover={{ y: -5, scale: 1.04 }}
-                    className="group flex flex-col items-center justify-center gap-3 rounded-[24px] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl transition-colors hover:border-white/20"
-                  >
-                    <span className="relative flex items-center justify-center">
-                      <span
-                        aria-hidden
-                        className="pointer-events-none absolute h-12 w-12 rounded-full opacity-20 blur-xl transition-opacity duration-500 group-hover:opacity-70"
-                        style={{ background: color }}
-                      />
-                      <Icon
-                        size={42}
-                        style={{ color }}
-                        className="relative z-10"
-                        aria-label={name}
-                      />
-                    </span>
-                    <span className="text-[13px] font-medium text-slate-200">
-                      {name}
-                    </span>
-                  </motion.div>
+                {STACK.map((group) => (
+                  <div key={group.category}>
+                    <SectionLabel className="mb-4">{group.category}</SectionLabel>
+                    <motion.div
+                      variants={grid}
+                      initial="hidden"
+                      animate="show"
+                      className="grid grid-cols-3 gap-3 sm:grid-cols-4"
+                    >
+                      {group.items.map(({ name, Icon, color }) => (
+                        <motion.div
+                          key={name}
+                          variants={cardIn}
+                          whileHover={{ y: -4 }}
+                          className="group flex flex-col items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-2 py-4 text-center backdrop-blur-xl transition-colors hover:border-white/20"
+                        >
+                          <span className="relative flex h-8 items-center justify-center">
+                            <span
+                              aria-hidden
+                              className="pointer-events-none absolute h-8 w-8 rounded-full opacity-25 blur-lg transition-opacity duration-500 group-hover:opacity-70"
+                              style={{ background: color }}
+                            />
+                            <Icon
+                              size={28}
+                              style={{ color }}
+                              className="relative z-10"
+                            />
+                          </span>
+                          <span className="text-[11.5px] font-medium leading-tight text-slate-300">
+                            {name}
+                          </span>
+                        </motion.div>
+                      ))}
+                    </motion.div>
+                  </div>
                 ))}
               </motion.div>
             )}

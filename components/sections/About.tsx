@@ -25,7 +25,7 @@ const pop: Variants = {
 };
 
 const QUOTE =
-  "Firmware que conversa con la nube, IA que corre en el edge, e interfaces que hacen legible un sistema complejo.";
+  "La robótica y automatización son la cúspide de los procesos industriales.";
 
 const scrollToProjects = () =>
   document.getElementById("projects")?.scrollIntoView({ behavior: "smooth" });
@@ -158,7 +158,7 @@ export function About() {
 
               <motion.p
                 variants={pop}
-                className="rounded-xl border border-white/10 bg-white/[0.03] px-5 py-3 text-[12px] italic leading-relaxed text-slate-300"
+                className="rounded-xl border border-white/10 bg-pcb-bg/[0.7] px-5 py-3 text-[14px] italic leading-relaxed text-slate-300"
               >
                 “{QUOTE}”
               </motion.p>
