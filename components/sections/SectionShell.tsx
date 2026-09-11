@@ -1,6 +1,7 @@
 "use client";
 
 import type { CSSProperties, ReactNode } from "react";
+import { useTranslations } from "next-intl";
 import { useSectionObserver } from "@/hooks/useSectionObserver";
 import { SECTION_MAP, type SectionId } from "@/lib/sections";
 import { cn } from "@/lib/utils";
@@ -30,12 +31,14 @@ export function SectionShell({
 }: SectionShellProps) {
   const ref = useSectionObserver(id);
   const theme = SECTION_MAP[id];
+  // La etiqueta accesible usa el mismo namespace de traducciones que la Navbar.
+  const tNav = useTranslations("nav");
 
   return (
     <section
       ref={ref}
       id={id}
-      aria-label={theme.label}
+      aria-label={tNav(id)}
       style={
         {
           "--section": theme.color,

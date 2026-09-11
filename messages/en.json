@@ -1,0 +1,101 @@
+{
+  "metadata": {
+    "title": "Portfolio · Diego A Caro",
+    "description": "Hybrid professional portfolio: software and AI development plus mechatronics engineering. Real-time 3D scene (React Three Fiber) with an LED lighting up a PCB."
+  },
+  "allProjectsMetadata": {
+    "title": "Projects · Diego A Caro",
+    "description": "All of Diego Alejandro Caro's projects: software, AI and mechatronic systems."
+  },
+  "nav": {
+    "srLabel": "Main navigation",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "hero": "Home",
+    "about": "About",
+    "projects": "Projects",
+    "contact": "Contact"
+  },
+  "languageSwitcher": {
+    "label": "Switch language",
+    "es": "ES",
+    "en": "EN"
+  },
+  "hero": {
+    "available": "✦ Available for projects",
+    "name": "Diego Alejandro Caro",
+    "title": "Mechatronics Engineer",
+    "roles": [
+      "Industrial Automation",
+      "Software Developer",
+      "From sensor to user"
+    ],
+    "bio": "Specialized in industrial automation and robotics. I have experience designing and implementing integrated hardware and software solutions.",
+    "scrollHint": "explore my work below",
+    "openTo": "open to hybrid roles and R&D collaborations",
+    "scroll": "Scroll"
+  },
+  "about": {
+    "label": "About",
+    "titlePrefix": "My",
+    "titleHighlight": "Profile",
+    "paragraph1": "Mechatronics engineer specialized in industrial automation, robotic control and hardware-software integration. Skilled at designing and implementing real-time control architectures and robotic gait analysis, using low-level C/C++ firmware optimized through direct port registers on microcontrollers and IMU-based stability metrics.",
+    "paragraph2": "Strong ability to bridge the physical control of mechatronic systems with modern software architectures, spanning simulation environments and robotic operating systems (ROS 2) through to TypeScript backend infrastructure and containerized deployments with Docker. Known for a rigorous approach to data modeling, network analysis and automated testing to keep automation systems highly reliable, accurate and scalable.",
+    "quote": "Robotics and automation are the pinnacle of industrial processes.",
+    "downloadCv": "Download CV",
+    "viewProjects": "View projects"
+  },
+  "projects": {
+    "label": "Portfolio",
+    "titlePrefix": "My",
+    "titleHighlight": "Projects",
+    "viewAll": "View all projects",
+    "tabs": {
+      "projects": "Projects",
+      "stack": "Stack",
+      "certifications": "Certifications"
+    },
+    "kind": {
+      "software": "SOFTWARE",
+      "hybrid": "HYBRID",
+      "hardware": "HARDWARE"
+    },
+    "card": {
+      "view": "View"
+    },
+    "stack": {
+      "frontend": "Frontend",
+      "backendData": "Backend & data",
+      "mobile": "Mobile",
+      "tools": "Tools"
+    },
+    "certifications": {
+      "comingTitle": "Certificates coming soon",
+      "comingBody": "Credentials and courses will be listed here soon. Each image can be enlarged with a click.",
+      "enlarge": "Enlarge: {name}",
+      "close": "Close",
+      "prev": "Previous certificate",
+      "next": "Next certificate"
+    }
+  },
+  "allProjects": {
+    "back": "Back to home",
+    "eyebrow": "Portfolio",
+    "titlePrefix": "All",
+    "titleHighlight": "projects",
+    "count": "{count} software, AI and mechatronic-systems projects — from sensor to user."
+  },
+  "contact": {
+    "label": "Contact",
+    "title": "Let's talk",
+    "subtitle": "Have something in mind? Write to me and I'll get back with a first technical read.",
+    "formTitle": "Send me a message",
+    "namePlaceholder": "Your name",
+    "emailPlaceholder": "Your email",
+    "messagePlaceholder": "Your message",
+    "send": "Send message",
+    "subject": "Message from {name}",
+    "connect": "Connect with me",
+    "footer": "Diego Alejandro Caro"
+  }
+}

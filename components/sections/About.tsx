@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { motion, type Variants } from "framer-motion";
 import { ArrowUpRight, FileText } from "lucide-react";
 import { SectionShell } from "@/components/sections/SectionShell";
@@ -23,9 +24,6 @@ const pop: Variants = {
   hidden: { opacity: 0, scale: 0.92, y: 24 },
   show: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.8, ease } },
 };
-
-const QUOTE =
-  "La robótica y automatización son la cúspide de los procesos industriales.";
 
 const scrollToProjects = () =>
   document.getElementById("projects")?.scrollIntoView({ behavior: "smooth" });
@@ -51,6 +49,8 @@ function ProfilePhoto({ className }: { className?: string }) {
 }
 
 export function About() {
+  const t = useTranslations("about");
+
   return (
     <SectionShell
       id="about"
@@ -65,14 +65,14 @@ export function About() {
           viewport={{ once: true, margin: "-100px" }}
         >
           <motion.div variants={fadeUp} className="mb-4">
-            <SectionLabel>Sobre mí</SectionLabel>
+            <SectionLabel>{t("label")}</SectionLabel>
           </motion.div>
 
           <motion.h2
             variants={fadeUp}
             className="text-[clamp(30px,5vw,46px)] font-extrabold leading-[1.03] tracking-[-0.03em] text-white"
           >
-            Mi <span className="text-[var(--section)]">Perfil</span>
+            {t("titlePrefix")} <span className="text-[var(--section)]">{t("titleHighlight")}</span>
           </motion.h2>
 
           {/* items-start alinea el borde superior de ambas columnas: en
@@ -92,26 +92,14 @@ export function About() {
                 variants={fadeUp}
                 className="text-justify text-[16px] leading-[1.8] text-slate-400 hyphens-auto"
               >
-                Ingeniero mecatrónico con perfil multidisciplinario centrado en
-                el desarrollo de software, arquitectura de sistemas y la
-                integración de inteligencia artificial. Experto en construir
-                infraestructura backend escalable con TypeScript y Docker
-                Compose, además de integrar modelos de IA locales con Ollama y
-                herramientas avanzadas como llama.cpp.
+                {t("paragraph1")}
               </motion.p>
 
               <motion.p
                 variants={fadeUp}
                 className="mt-4 text-justify text-[16px] leading-[1.8] text-slate-400 hyphens-auto"
               >
-                Cuenta con sólida experiencia en control de sistemas robóticos y
-                firmware en C/C++, optimizando arquitecturas de control en tiempo
-                real mediante registros de puerto directos y métricas de
-                estabilidad basadas en IMU. Destaca por un enfoque estructurado
-                para la resolución de problemas técnicos, diseño riguroso de
-                bases de datos, análisis de redes y aplicación de testing
-                automatizado para garantizar software confiable y de alta
-                calidad.
+                {t("paragraph2")}
               </motion.p>
 
               {/* cita — solo móvil (en escritorio va bajo la foto) */}
@@ -119,7 +107,7 @@ export function About() {
                 variants={pop}
                 className="clear-both mt-6 rounded-xl border border-white/10 bg-white/[0.03] px-5 py-3 text-[12px] italic leading-relaxed text-slate-300 lg:hidden"
               >
-                “{QUOTE}”
+                “{t("quote")}”
               </motion.p>
 
               <motion.div variants={fadeUp} className="mt-7 flex flex-wrap gap-3">
@@ -129,7 +117,7 @@ export function About() {
                   className="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2.5 text-[13px] font-semibold text-black transition-transform duration-200 hover:-translate-y-0.5"
                 >
                   <FileText size={14} />
-                  Descargar CV
+                  {t("downloadCv")}
                 </a>
                 <button
                   type="button"
@@ -137,7 +125,7 @@ export function About() {
                   className="inline-flex items-center gap-2 rounded-lg border border-white/20 px-4 py-2.5 text-[13px] font-semibold text-slate-200 transition-colors duration-200 hover:border-white/40 hover:bg-white/[0.04]"
                 >
                   <ArrowUpRight size={14} />
-                  Ver proyectos
+                  {t("viewProjects")}
                 </button>
               </motion.div>
             </div>
@@ -160,7 +148,7 @@ export function About() {
                 variants={pop}
                 className="rounded-xl border border-white/10 bg-pcb-bg/[0.7] px-5 py-3 text-[14px] italic leading-relaxed text-slate-300"
               >
-                “{QUOTE}”
+                “{t("quote")}”
               </motion.p>
             </div>
           </div>

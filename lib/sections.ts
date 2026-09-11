@@ -5,6 +5,12 @@
  * serigrafia (SYS_STATUS) y los canales RGB necesarios para componer
  * gradientes / sombras con opacidad variable.
  *
+ * `status`, `code` y `meaning` son texto de "telemetria" deliberadamente en
+ * estilo tecnico/ingles (parte de la estetica HUD) y no se traducen. La
+ * etiqueta legible de navegacion SI se traduce, pero vive en
+ * `messages/{locale}.json` (namespace "nav", una clave por `id`) en vez de
+ * aqui, para no mezclar datos de diseno con contenido i18n.
+ *
  * El orden del array define el orden de scroll y de la navegacion.
  */
 
@@ -13,8 +19,6 @@ export type SectionId = "hero" | "about" | "projects" | "contact";
 export interface SectionTheme {
   /** Identificador y ancla (#hero, #about, ...). */
   id: SectionId;
-  /** Etiqueta legible para navegacion y accesibilidad. */
-  label: string;
   /** Texto de serigrafia que acompania al LED. */
   status: string;
   /** Codigo corto tipo telemetria (mono). */
@@ -30,7 +34,6 @@ export interface SectionTheme {
 export const SECTIONS: readonly SectionTheme[] = [
   {
     id: "hero",
-    label: "Inicio",
     status: "SYSTEM READY",
     code: "SYS_NOMINAL",
     meaning: "Estado nominal / Sistema listo",
@@ -39,7 +42,6 @@ export const SECTIONS: readonly SectionTheme[] = [
   },
   {
     id: "about",
-    label: "Sobre mi",
     status: "CORE PROCESSING",
     code: "CORE_ACTIVE",
     meaning: "Nucleo operativo / Procesamiento",
@@ -48,7 +50,6 @@ export const SECTIONS: readonly SectionTheme[] = [
   },
   {
     id: "projects",
-    label: "Proyectos",
     status: "WORKLOAD // OUTPUT",
     code: "LOAD_HIGH",
     meaning: "Carga de trabajo / Output",
@@ -57,7 +58,6 @@ export const SECTIONS: readonly SectionTheme[] = [
   },
   {
     id: "contact",
-    label: "Contacto",
     status: "DATA TRANSMISSION",
     code: "TX_OPEN",
     meaning: "Transmision / Datos",

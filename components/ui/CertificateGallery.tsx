@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import Image from "next/image";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
 import { ChevronLeft, ChevronRight, X, ZoomIn } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import { CERTIFICATES } from "@/lib/certifications";
 
 const ease: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -26,10 +27,12 @@ const thumbV: Variants = {
  * Cada miniatura abre un visor a pantalla completa donde la imagen se amplía.
  * Se navega con las flechas ← → (teclado o botones) y se cierra con Esc, el
  * botón × o un clic en el fondo. Las imágenes viven en `public/certificates/`
- * y se declaran en `lib/certifications.ts`; mientras no haya ninguna se
- * muestra un estado "en camino".
+ * y se declaran en `lib/certifications.ts` con título bilingüe (`{ es, en }`);
+ * mientras no haya ninguna se muestra un estado "en camino".
  */
 export function CertificateGallery() {
+  const locale = useLocale();
+  const t = useTranslations("projects.certifications");
   const [index, setIndex] = useState<number | null>(null);
   const [mounted, setMounted] = useState(false);
   const isOpen = index !== null;
@@ -75,11 +78,10 @@ export function CertificateGallery() {
           aria-hidden
         />
         <p className="text-[14px] font-medium text-slate-200">
-          Certificados en camino
+          {t("comingTitle")}
         </p>
         <p className="mt-1 text-[12px] leading-relaxed text-slate-500">
-          Pronto se listarán aquí las credenciales y cursos. Cada imagen se podrá
-          ampliar con un clic.
+          {t("comingBody")}
         </p>
       </motion.div>
     );
@@ -102,12 +104,12 @@ export function CertificateGallery() {
             variants={thumbV}
             whileHover={{ y: -4 }}
             onClick={() => setIndex(i)}
-            aria-label={`Ampliar: ${cert.title}`}
+            aria-label={t("enlarge", { name: cert.title[locale] })}
             className="group relative aspect-[4/3] overflow-hidden rounded-[20px] border border-white/10 bg-white/[0.03] text-left transition-colors hover:border-white/25"
           >
             <Image
               src={cert.src}
-              alt={cert.title}
+              alt={cert.title[locale]}
               fill
               sizes="(max-width: 640px) 50vw, 33vw"
               className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
@@ -121,7 +123,7 @@ export function CertificateGallery() {
             </span>
             <span className="absolute inset-x-0 bottom-0 p-3">
               <span className="block truncate text-[12px] font-semibold text-white">
-                {cert.title}
+                {cert.title[locale]}
               </span>
               {cert.issuer && (
                 <span className="block truncate text-[11px] text-slate-400">
@@ -146,12 +148,12 @@ export function CertificateGallery() {
                 onClick={close}
                 role="dialog"
                 aria-modal="true"
-                aria-label={current.title}
+                aria-label={current.title[locale]}
               >
                 <button
                   type="button"
                   onClick={close}
-                  aria-label="Cerrar"
+                  aria-label={t("close")}
                   className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/[0.06] text-slate-200 transition-colors hover:bg-white/[0.12] hover:text-white"
                 >
                   <X size={18} />
@@ -165,7 +167,7 @@ export function CertificateGallery() {
                         e.stopPropagation();
                         step(-1);
                       }}
-                      aria-label="Certificado anterior"
+                      aria-label={t("prev")}
                       className="absolute left-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-white/[0.06] text-slate-200 transition-colors hover:bg-white/[0.12] hover:text-white sm:left-6"
                     >
                       <ChevronLeft size={20} />
@@ -176,7 +178,7 @@ export function CertificateGallery() {
                         e.stopPropagation();
                         step(1);
                       }}
-                      aria-label="Certificado siguiente"
+                      aria-label={t("next")}
                       className="absolute right-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-white/[0.06] text-slate-200 transition-colors hover:bg-white/[0.12] hover:text-white sm:right-6"
                     >
                       <ChevronRight size={20} />
@@ -195,7 +197,7 @@ export function CertificateGallery() {
                   <div className="relative h-[70vh] w-full">
                     <Image
                       src={current.src}
-                      alt={current.title}
+                      alt={current.title[locale]}
                       fill
                       sizes="90vw"
                       className="object-contain"
@@ -204,7 +206,7 @@ export function CertificateGallery() {
                   </div>
                   <figcaption className="mt-4 text-center">
                     <span className="block text-[14px] font-semibold text-white">
-                      {current.title}
+                      {current.title[locale]}
                     </span>
                     {current.issuer && (
                       <span className="mt-0.5 block text-[12px] text-slate-400">

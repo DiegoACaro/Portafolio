@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { motion, type Variants } from "framer-motion";
 import { ArrowUpRight, Mail, MessageSquare, Send, User } from "lucide-react";
 import { SectionShell } from "@/components/sections/SectionShell";
@@ -24,10 +25,11 @@ const SOCIALS = [
 ];
 
 export function Contact() {
+  const t = useTranslations("contact");
   const [form, setForm] = useState({ name: "", email: "", message: "" });
 
   const mailto = `mailto:${EMAIL}?subject=${encodeURIComponent(
-    `Contacto de ${form.name || "…"}`,
+    t("subject", { name: form.name || "…" }),
   )}&body=${encodeURIComponent(`${form.message}\n\n— ${form.name} (${form.email})`)}`;
 
   const set =
@@ -53,17 +55,16 @@ export function Contact() {
           transition={{ duration: 0.8, ease }}
           className="flex flex-col items-center text-center"
         >
-          <SectionLabel className="mb-4">Contacto</SectionLabel>
+          <SectionLabel className="mb-4">{t("label")}</SectionLabel>
           <motion.h2
             animate={{ y: [0, -8, 0] }}
             transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
             className="text-[clamp(30px,5vw,56px)] font-extrabold tracking-[-0.03em] text-white"
           >
-            Hablemos
+            {t("title")}
           </motion.h2>
           <p className="mt-3 max-w-lg text-[14px] text-slate-400">
-            ¿Tienes algo en mente? Escríbeme y te respondo con una primera
-            lectura técnica.
+            {t("subtitle")}
           </p>
         </motion.div>
 
@@ -77,10 +78,7 @@ export function Contact() {
             transition={{ duration: 0.8, ease }}
           >
             <GlassCard className="flex flex-col p-5 sm:p-8">
-              <h3 className="text-[20px] font-bold text-white">Envíame un mensaje</h3>
-              {/* <p className="mt-2 text-[13px] text-slate-500">
-                Si tienes un proyecto en mente o quieres hablar sobre una oportunidad, escríbeme y te respondo pronto.
-              </p> */}
+              <h3 className="text-[20px] font-bold text-white">{t("formTitle")}</h3>
 
               <motion.div
                 initial="hidden"
@@ -94,7 +92,7 @@ export function Contact() {
                   <input
                     value={form.name}
                     onChange={set("name")}
-                    placeholder="Tu nombre"
+                    placeholder={t("namePlaceholder")}
                     className={inputCls}
                   />
                 </motion.div>
@@ -104,7 +102,7 @@ export function Contact() {
                     type="email"
                     value={form.email}
                     onChange={set("email")}
-                    placeholder="Tu email"
+                    placeholder={t("emailPlaceholder")}
                     className={inputCls}
                   />
                 </motion.div>
@@ -114,7 +112,7 @@ export function Contact() {
                     rows={4}
                     value={form.message}
                     onChange={set("message")}
-                    placeholder="Tu mensaje"
+                    placeholder={t("messagePlaceholder")}
                     className={`${inputCls} resize-none pt-3.5`}
                   />
                 </motion.div>
@@ -124,7 +122,7 @@ export function Contact() {
                   className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[var(--section)] py-3.5 text-[14px] font-semibold text-pcb-deep transition-transform duration-200 hover:-translate-y-0.5"
                 >
                   <Send size={15} />
-                  Enviar mensaje
+                  {t("send")}
                 </motion.a>
               </motion.div>
             </GlassCard>
@@ -138,8 +136,7 @@ export function Contact() {
             transition={{ duration: 0.8, delay: 0.1, ease }}
           >
             <GlassCard className="p-5 sm:p-8">
-              {/* <p className="mb-4 text-[13px] text-slate-500">Conecta conmigo</p> */}
-              <h3 className="text-[20px] font-bold text-white mb-3">Conecta conmigo</h3>
+              <h3 className="text-[20px] font-bold text-white mb-3">{t("connect")}</h3>
               <div className="space-y-2.5">
                 {SOCIALS.map(({ label, handle, icon: Icon, href }) => (
                   <a
@@ -168,7 +165,7 @@ export function Contact() {
         </div>
 
         <p className="mt-16 text-center font-mono text-[11px] text-white/30">
-          © {new Date().getFullYear()} Diego Alejandro Caro
+          © {new Date().getFullYear()} {t("footer")}
         </p>
       </div>
     </SectionShell>

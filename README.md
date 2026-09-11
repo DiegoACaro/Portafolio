@@ -16,6 +16,7 @@ color según la sección visible e **ilumina las pistas de la placa** con su luz
 - **Next.js 14** (App Router) · React 18 · TypeScript (estricto)
 - **Three.js** · **@react-three/fiber** · **@react-three/drei**
 - **Tailwind CSS** · **Framer Motion** (HUD / entradas por scroll)
+- **next-intl** — i18n (`/es` / `/en`, detección automática por navegador)
 
 ### Dependencias 3D (versiones instaladas)
 
@@ -31,18 +32,47 @@ npm i -D @types/three@0.169.0
 
 ```bash
 npm install
-npm run dev      # http://localhost:3000
+npm run dev      # http://localhost:3000 -> redirige a /es o /en según el navegador
 npm run build && npm run start
 ```
+
+## Idiomas (i18n)
+
+El sitio vive bajo `/es` y `/en` (`next-intl`). `middleware.ts` detecta el
+idioma del navegador (`Accept-Language`) en la primera visita, redirige
+`/` -> `/es` o `/en` y recuerda la elección en la cookie `NEXT_LOCALE`
+(también se actualiza al usar el `LanguageSwitcher`).
+
+- `i18n/routing.ts` — locales soportados (`es`, `en`) y locale por defecto.
+- `i18n/navigation.ts` — `Link` / `usePathname` / `useRouter` locale-aware
+  (envuelven `next/link` y `next/navigation`).
+- `i18n/request.ts` — resuelve el locale de cada request y carga
+  `messages/{locale}.json`.
+- `messages/es.json`, `messages/en.json` — todo el copy de la UI, con las
+  mismas claves en ambos archivos.
+- `lib/projects.ts`, `lib/certifications.ts` — el contenido "de datos"
+  (nombre/resumen de cada proyecto, título de cada certificado) es bilingüe
+  (`{ es, en }` por campo); los componentes resuelven el idioma con
+  `useLocale()`.
+- `components/ui/LanguageSwitcher.tsx` — selector ES/EN; cambia solo el
+  segmento de locale y conserva ruta, query y `#ancla` actuales.
+
+> Cambiar de idioma remonta la escena 3D (recarga el GLB + fusión de
+> geometría), porque `[locale]` es el segmento raíz de la app — es el
+> comportamiento esperado de esta arquitectura, no un bug.
 
 ## Arquitectura
 
 ```
+app/[locale]/
+  layout.tsx             <html lang={locale}>, NextIntlClientProvider,
+                          <SectionProvider> + <Navbar>
+  page.tsx                <BackgroundScene/> + <StatusHUD/> + las 4 secciones
+  proyectos/page.tsx      <AllProjects/> (todos los proyectos, no solo featured)
 app/
-  layout.tsx            <SectionProvider> + <SideNav>  (sin three.js en el bundle inicial)
-  page.tsx              <BackgroundScene/> + <StatusHUD/> + las 4 secciones
-  globals.css           tokens, utilidades (.silkscreen, .panel-pcb), reduce-motion
-  icon.svg              favicon
+  globals.css            tokens, utilidades (.silkscreen, .panel-pcb), reduce-motion
+  icon.svg               favicon
+middleware.ts             detección de idioma + redirección /es /en
 
 components/3d/
   BackgroundScene.tsx   contenedor fixed inset-0 -z-10 pointer-events-none.

@@ -1,3 +1,4 @@
+import { setRequestLocale } from "next-intl/server";
 import { BackgroundScene } from "@/components/3d/BackgroundScene";
 import { IntroGate } from "@/components/IntroGate";
 import { StatusHUD } from "@/components/StatusHUD";
@@ -5,6 +6,11 @@ import { About } from "@/components/sections/About";
 import { Contact } from "@/components/sections/Contact";
 import { Hero } from "@/components/sections/Hero";
 import { Projects } from "@/components/sections/Projects";
+import { routing, type AppLocale } from "@/i18n/routing";
+
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
+}
 
 /**
  * Pagina principal.
@@ -24,7 +30,14 @@ import { Projects } from "@/components/sections/Projects";
  *   Projects -> #F59E0B  Ambar    · Carga de trabajo
  *   Contact  -> #A855F7  Purpura  · Transmision de datos
  */
-export default function HomePage() {
+export default async function HomePage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale as AppLocale);
+
   return (
     <>
       {/* fondo 3D: fixed inset-0 pointer-events-none -z-10 */}

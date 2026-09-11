@@ -4,22 +4,32 @@
  * - La sección "Proyectos" de la home muestra los que tienen `featured: true`.
  * - La página `/proyectos` muestra TODOS.
  *
+ * Contenido bilingüe: `name`, `summary` y `metric` son `{ es, en }` — los
+ * componentes (`ProjectCard`, `AllProjects`) escogen el idioma con el
+ * `locale` activo. `stack` NO se traduce (nombres propios de tecnologías).
+ *
  * Para añadir un proyecto: agrega un objeto al array (con un `slug` único).
  */
 
-export type ProjectKind = "HÍBRIDO" | "SOFTWARE" | "HARDWARE";
+import type { AppLocale } from "@/i18n/routing";
+
+/** Identificador interno del tipo de proyecto; su texto vive en `messages/{locale}.json` -> "projects.kind". */
+export type ProjectKind = "hybrid" | "software" | "hardware";
+
+/** Texto con su traducción a cada idioma soportado. */
+export type LocalizedText = Record<AppLocale, string>;
 
 export interface Project {
   /** Identificador único (para keys y posibles páginas de detalle). */
   slug: string;
-  name: string;
+  name: LocalizedText;
   kind: ProjectKind;
   /** Descripción corta (2–3 líneas). */
-  summary: string;
-  /** Tecnologías / stack. */
+  summary: LocalizedText;
+  /** Tecnologías / stack (nombres propios, iguales en ambos idiomas). */
   stack: string[];
   /** Métrica o resultado destacado (opcional). */
-  metric?: string;
+  metric?: LocalizedText;
   /** Enlace externo: demo, repo, etc. (opcional). */
   href?: string;
   /** Año o rango (opcional). */
@@ -31,10 +41,15 @@ export interface Project {
 export const PROJECTS: Project[] = [
   {
     slug: "app-servicios-aduaneros-ia",
-    name: "App de servicios aduaneros con IA integrada",
-    kind: "SOFTWARE",
-    summary:
-      "Plataforma B2C con IA, casillero virtual y KYC que evalúa la viabilidad e impuestos de envíos internacionales bajo auditoría humana.",
+    name: {
+      es: "App de servicios aduaneros con IA integrada",
+      en: "Customs services app with integrated AI",
+    },
+    kind: "software",
+    summary: {
+      es: "Plataforma B2C con IA, casillero virtual y KYC que evalúa la viabilidad e impuestos de envíos internacionales bajo auditoría humana.",
+      en: "B2C platform with AI, a virtual mailbox and KYC that assesses the feasibility and duties of international shipments under human review.",
+    },
     stack: [
       "React",
       "TypeScript",
@@ -48,22 +63,38 @@ export const PROJECTS: Project[] = [
   },
   {
     slug: "plataforma-robotica-locomocion",
-    name: "Plataforma robótica con cambios de locomoción y redes neuronales biológicamente inspiradas",
-    kind: "HÍBRIDO",
-    summary:
-      "Robot con locomoción reconfigurable controlado por redes neuronales de inspiración biológica; control de bajo nivel en STM32 y telemetría por CAN.",
+    name: {
+      es: "Plataforma robótica con cambios de locomoción y redes neuronales biológicamente inspiradas",
+      en: "Robotic platform with locomotion switching and biologically-inspired neural networks",
+    },
+    kind: "hybrid",
+    summary: {
+      es: "Robot con locomoción reconfigurable controlado por redes neuronales de inspiración biológica; control de bajo nivel en STM32 y telemetría por CAN.",
+      en: "Robot with reconfigurable locomotion controlled by biologically-inspired neural networks; low-level control on STM32 with CAN-bus telemetry.",
+    },
     stack: ["STM32", "C++", "ROS 2", "CAN bus"],
-    metric: "±0.4 mm de repetibilidad",
+    metric: {
+      es: "±0.4 mm de repetibilidad",
+      en: "±0.4 mm repeatability",
+    },
     featured: true,
   },
   {
     slug: "copiloto-documental-rag",
-    name: "Copiloto documental RAG",
-    kind: "SOFTWARE",
-    summary:
-      "Asistente que responde sobre manuales técnicos con citas verificables. Ingesta, embeddings, reranking y evaluación continua.",
+    name: {
+      es: "Copiloto documental RAG",
+      en: "RAG document copilot",
+    },
+    kind: "software",
+    summary: {
+      es: "Asistente que responde sobre manuales técnicos con citas verificables. Ingesta, embeddings, reranking y evaluación continua.",
+      en: "Assistant that answers questions about technical manuals with verifiable citations. Ingestion, embeddings, reranking and continuous evaluation.",
+    },
     stack: ["TypeScript", "Next.js", "pgvector", "LLM APIs"],
-    metric: "92% respuestas con cita válida",
+    metric: {
+      es: "92% respuestas con cita válida",
+      en: "92% of answers with a valid citation",
+    },
     featured: true,
   },
 ];

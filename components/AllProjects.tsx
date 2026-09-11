@@ -4,6 +4,7 @@ import type { CSSProperties } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import { PROJECTS } from "@/lib/projects";
 import { ProjectCard } from "@/components/ui/ProjectCard";
 import { SectionLabel } from "@/components/ui/SectionLabel";
@@ -17,6 +18,9 @@ const ACCENT = {
 } as CSSProperties;
 
 export function AllProjects() {
+  const locale = useLocale();
+  const t = useTranslations("allProjects");
+
   return (
     <main className="relative z-10 min-h-screen" style={ACCENT}>
       {/* fondo estático (esta página no monta la escena 3D) */}
@@ -30,11 +34,11 @@ export function AllProjects() {
 
       <div className="mx-auto w-full max-w-6xl px-6 pb-24 pt-32 sm:px-12 lg:px-20">
         <Link
-          href="/#projects"
+          href={`/${locale}#projects`}
           className="inline-flex items-center gap-2 font-mono text-[12px] uppercase tracking-[0.18em] text-slate-400 transition-colors hover:text-white"
         >
           <ArrowLeft size={14} />
-          Volver al inicio
+          {t("back")}
         </Link>
 
         <motion.div
@@ -43,13 +47,12 @@ export function AllProjects() {
           transition={{ duration: 0.7, ease }}
           className="mt-8"
         >
-          <SectionLabel className="mb-4">Portafolio</SectionLabel>
+          <SectionLabel className="mb-4">{t("eyebrow")}</SectionLabel>
           <h1 className="text-[clamp(30px,5vw,52px)] font-extrabold tracking-[-0.03em] text-white">
-            Todos los <span className="text-[var(--section)]">proyectos</span>
+            {t("titlePrefix")} <span className="text-[var(--section)]">{t("titleHighlight")}</span>
           </h1>
           <p className="mt-3 max-w-lg text-[14px] text-slate-400">
-            {PROJECTS.length} proyectos de software, IA y sistemas mecatrónicos —
-            del sensor al usuario.
+            {t("count", { count: PROJECTS.length })}
           </p>
         </motion.div>
 

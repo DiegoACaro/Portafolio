@@ -1,33 +1,31 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import { useSectionState } from "@/context/SectionContext";
+import { usePathname } from "@/i18n/navigation";
 import { SECTIONS, SECTION_MAP, type SectionId } from "@/lib/sections";
+import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
 
-/**
- * Navbar tipo pildora (estructura del Template) adaptada al proyecto:
- * en la home la seccion activa y su color salen de `useSectionState()` — el
- * mismo estado que pinta el LED 3D del fondo. Fuera de la home (p. ej.
- * `/proyectos`) los enlaces apuntan a `/#seccion` y no hay scroll-spy.
- */
 export function Navbar() {
   const { activeId, active } = useSectionState();
   const pathname = usePathname();
+  const locale = useLocale();
+  const t = useTranslations("nav");
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
   const onHome = pathname === "/";
-  // Qué item resaltar: en la home lo dice el observer; en /proyectos, "Proyectos".
   const currentId: SectionId | null = onHome
     ? activeId
     : pathname.startsWith("/proyectos")
       ? "projects"
       : null;
   const accent = currentId ? SECTION_MAP[currentId].color : active.color;
-  const hrefFor = (id: SectionId) => (onHome ? `#${id}` : `/#${id}`);
+  const homeHref = `/${locale}`;
+  const hrefFor = (id: SectionId) => (onHome ? `#${id}` : `${homeHref}#${id}`);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -41,7 +39,7 @@ export function Navbar() {
       initial={{ opacity: 0, y: -32 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-      aria-label="Navegación principal"
+      aria-label={t("srLabel")}
       className="fixed inset-x-3 top-3 z-50 sm:inset-x-6 sm:top-5"
     >
       <div
@@ -52,14 +50,14 @@ export function Navbar() {
         }`}
       >
         <a
-          href={onHome ? "#hero" : "/"}
+          href={onHome ? "#hero" : homeHref}
           className="font-mono text-[13px] tracking-[0.12em] text-slate-300 transition-colors hover:text-white"
         >
           diego<span style={{ color: accent }}>.</span>caro
         </a>
 
-        {/* desktop */}
-        <div className="hidden items-center gap-8 md:flex">
+        {/* desktop - ml-auto empuja los enlaces hacia la derecha antes del LanguageSwitcher */}
+        <div className="hidden items-center gap-8 md:flex ml-auto">
           {SECTIONS.map((section) => {
             const isActive = section.id === currentId;
             return (
@@ -71,7 +69,7 @@ export function Navbar() {
                   isActive ? "text-white" : "text-slate-400 hover:text-slate-200"
                 }`}
               >
-                {section.label}
+                {t(section.id)}
                 <motion.span
                   className="absolute inset-x-0 bottom-0 h-px origin-left"
                   style={{ backgroundColor: section.color }}
@@ -84,10 +82,14 @@ export function Navbar() {
           })}
         </div>
 
+        <div className="hidden md:block">
+          <LanguageSwitcher />
+        </div>
+
         {/* mobile toggle */}
         <button
           type="button"
-          aria-label={open ? "Cerrar menú" : "Abrir menú"}
+          aria-label={open ? t("closeMenu") : t("openMenu")}
           onClick={() => setOpen((v) => !v)}
           className="flex h-8 w-8 items-center justify-center rounded-full text-slate-300 md:hidden"
         >
@@ -124,10 +126,13 @@ export function Navbar() {
                         : "rgba(255,255,255,0.2)",
                     }}
                   />
-                  {section.label}
+                  {t(section.id)}
                 </a>
               );
             })}
+            <div className="mt-1 flex justify-center border-t border-white/5 pt-3">
+              <LanguageSwitcher />
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

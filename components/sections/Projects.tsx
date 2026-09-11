@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, type ComponentType, type CSSProperties } from "react";
-import Link from "next/link";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
 import {
   ArrowRight,
@@ -11,6 +10,7 @@ import {
   Sparkles,
   Webhook,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import {
   SiAndroid,
   SiCss,
@@ -34,6 +34,7 @@ import {
   SiVercel,
   SiVite,
 } from "react-icons/si";
+import { Link } from "@/i18n/navigation";
 import { SectionShell } from "@/components/sections/SectionShell";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { ProjectCard } from "@/components/ui/ProjectCard";
@@ -67,14 +68,18 @@ type StackIcon = ComponentType<{
 /** Color de la sección: lo usan las herramientas sin logo de marca propio. */
 const ACCENT = "var(--section)";
 
+type StackCategoryId = "frontend" | "backendData" | "mobile" | "tools";
+
 /**
  * Stack técnico agrupado por categoría (logo + color de marca). Las entradas
  * sin marca propia — diseño responsive, APIs REST, auth, etc. — usan un icono
- * de lucide teñido con el acento de la sección.
+ * de lucide teñido con el acento de la sección. `id` mapea a
+ * `messages/{locale}.json` -> "projects.stack" para el título del grupo; los
+ * nombres de tecnología (`name`) no se traducen (son nombres propios).
  */
-const STACK: { category: string; items: { name: string; Icon: StackIcon; color: string }[] }[] = [
+const STACK: { id: StackCategoryId; items: { name: string; Icon: StackIcon; color: string }[] }[] = [
   {
-    category: "Frontend",
+    id: "frontend",
     items: [
       { name: "React", Icon: SiReact, color: "#61DAFB" },
       { name: "TypeScript", Icon: SiTypescript, color: "#3178C6" },
@@ -83,11 +88,11 @@ const STACK: { category: string; items: { name: string; Icon: StackIcon; color: 
       { name: "React Query", Icon: SiReactquery, color: "#FF4154" },
       { name: "HTML5", Icon: SiHtml5, color: "#E34F26" },
       { name: "CSS", Icon: SiCss, color: "#1572B6" },
-      { name: "Diseño responsive", Icon: MonitorSmartphone, color: ACCENT },
+      { name: "Responsive design", Icon: MonitorSmartphone, color: ACCENT },
     ],
   },
   {
-    category: "Backend & datos",
+    id: "backendData",
     items: [
       { name: "PHP", Icon: SiPhp, color: "#777BB4" },
       { name: "Laravel", Icon: SiLaravel, color: "#FF2D20" },
@@ -95,12 +100,12 @@ const STACK: { category: string; items: { name: string; Icon: StackIcon; color: 
       { name: "Supabase", Icon: SiSupabase, color: "#3ECF8E" },
       { name: "PostgreSQL", Icon: SiPostgresql, color: "#4169E1" },
       { name: "MySQL", Icon: SiMysql, color: "#4479A1" },
-      { name: "APIs REST", Icon: Webhook, color: ACCENT },
+      { name: "REST APIs", Icon: Webhook, color: ACCENT },
       { name: "Auth / RLS", Icon: ShieldCheck, color: ACCENT },
     ],
   },
   {
-    category: "Móvil",
+    id: "mobile",
     items: [
       { name: "Kotlin", Icon: SiKotlin, color: "#7F52FF" },
       { name: "Android", Icon: SiAndroid, color: "#3DDC84" },
@@ -109,28 +114,26 @@ const STACK: { category: string; items: { name: string; Icon: StackIcon; color: 
     ],
   },
   {
-    category: "Herramientas",
+    id: "tools",
     items: [
       { name: "Git", Icon: SiGit, color: "#F05032" },
       { name: "GitHub", Icon: SiGithub, color: "#FFFFFF" },
       { name: "Figma", Icon: SiFigma, color: "#F24E1E" },
       { name: "Vercel", Icon: SiVercel, color: "#FFFFFF" },
       { name: "Linux", Icon: SiLinux, color: "#FCC624" },
-      { name: "IA / LLMs", Icon: Sparkles, color: ACCENT },
+      { name: "AI / LLMs", Icon: Sparkles, color: ACCENT },
     ],
   },
 ];
 
-const TABS = [
-  { id: "projects", label: "Proyectos" },
-  { id: "languages", label: "Stack" },
-  { id: "certifications", label: "Certificaciones" },
-] as const;
+const TAB_IDS = ["projects", "stack", "certifications"] as const;
+type TabId = (typeof TAB_IDS)[number];
 
 /* ---------------- componente ---------------- */
 
 export function Projects() {
-  const [tab, setTab] = useState<(typeof TABS)[number]["id"]>("projects");
+  const t = useTranslations("projects");
+  const [tab, setTab] = useState<TabId>("projects");
 
   return (
     <SectionShell
@@ -147,32 +150,32 @@ export function Projects() {
           transition={{ duration: 0.8, ease }}
           className="flex flex-col items-center text-center"
         >
-          <SectionLabel className="mb-4">Portafolio</SectionLabel>
+          <SectionLabel className="mb-4">{t("label")}</SectionLabel>
           <h2 className="text-[clamp(28px,4.5vw,46px)] font-extrabold tracking-[-0.03em] text-white">
-            Mis <span className="text-[var(--section)]">Proyectos</span>
+            {t("titlePrefix")} <span className="text-[var(--section)]">{t("titleHighlight")}</span>
           </h2>
         </motion.div>
 
         {/* tabs */}
         <div className="mt-10 flex justify-center">
           <div className="flex w-full max-w-md gap-2 rounded-full border border-white/10 bg-white/[0.04] p-1.5 backdrop-blur-xl">
-            {TABS.map((t) => (
+            {TAB_IDS.map((id) => (
               <button
-                key={t.id}
+                key={id}
                 type="button"
-                onClick={() => setTab(t.id)}
+                onClick={() => setTab(id)}
                 className={`relative flex-1 rounded-full py-2.5 text-[13px] font-medium transition-colors duration-300 ${
-                  tab === t.id ? "text-white" : "text-slate-400 hover:text-slate-200"
+                  tab === id ? "text-white" : "text-slate-400 hover:text-slate-200"
                 }`}
               >
-                {tab === t.id && (
+                {tab === id && (
                   <motion.span
                     layoutId="tab-pill"
                     className="absolute inset-0 rounded-full bg-[rgba(var(--section-rgb),0.14)] ring-1 ring-[rgba(var(--section-rgb),0.3)]"
                     transition={{ duration: 0.35, ease }}
                   />
                 )}
-                <span className="relative">{t.label}</span>
+                <span className="relative">{t(`tabs.${id}`)}</span>
               </button>
             ))}
           </div>
@@ -211,7 +214,7 @@ export function Projects() {
                     href="/proyectos"
                     className="group flex h-full min-h-[3.5rem] w-full items-center justify-center gap-2 rounded-xl bg-[var(--section)] px-6 py-4 text-center text-[14px] font-semibold text-pcb-deep shadow-[0_14px_36px_-12px_rgba(var(--section-rgb),0.75)]"
                   >
-                    Ver todos los proyectos
+                    {t("viewAll")}
                     <ArrowRight
                       size={16}
                       className="transition-transform group-hover:translate-x-0.5"
@@ -221,9 +224,9 @@ export function Projects() {
               </motion.div>
             )}
 
-            {tab === "languages" && (
+            {tab === "stack" && (
               <motion.div
-                key="languages"
+                key="stack"
                 initial={{ opacity: 0, y: 24 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -16 }}
@@ -231,8 +234,8 @@ export function Projects() {
                 className="mx-auto max-w-3xl space-y-8"
               >
                 {STACK.map((group) => (
-                  <div key={group.category}>
-                    <SectionLabel className="mb-4">{group.category}</SectionLabel>
+                  <div key={group.id}>
+                    <SectionLabel className="mb-4">{t(`stack.${group.id}`)}</SectionLabel>
                     <motion.div
                       variants={grid}
                       initial="hidden"

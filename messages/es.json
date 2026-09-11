@@ -1,0 +1,101 @@
+{
+  "metadata": {
+    "title": "Portafolio · Diego A Caro",
+    "description": "Portafolio profesional híbrido: desarrollo de software e IA e ingeniería mecatrónica. Escena 3D en tiempo real (React Three Fiber) con un LED que ilumina una PCB."
+  },
+  "allProjectsMetadata": {
+    "title": "Proyectos · Diego A Caro",
+    "description": "Todos los proyectos de Diego Alejandro Caro: software, IA y sistemas mecatrónicos."
+  },
+  "nav": {
+    "srLabel": "Navegación principal",
+    "openMenu": "Abrir menú",
+    "closeMenu": "Cerrar menú",
+    "hero": "Inicio",
+    "about": "Sobre mí",
+    "projects": "Proyectos",
+    "contact": "Contacto"
+  },
+  "languageSwitcher": {
+    "label": "Cambiar idioma",
+    "es": "ES",
+    "en": "EN"
+  },
+  "hero": {
+    "available": "✦ Disponible para proyectos",
+    "name": "Diego Alejandro Caro",
+    "title": "Ingeniero Mecatrónico",
+    "roles": [
+      "Automatización Industrial",
+      "Desarrollador de Software",
+      "Del sensor al usuario"
+    ],
+    "bio": "Especializado en automatización industrial y robótica. Cuento con experiencia en el diseño e implementación de soluciones integradas de hardware y software.",
+    "scrollHint": "explora mi trabajo abajo",
+    "openTo": "abierto a roles híbridos y colaboraciones de I+D",
+    "scroll": "Scroll"
+  },
+  "about": {
+    "label": "Sobre mí",
+    "titlePrefix": "Mi",
+    "titleHighlight": "Perfil",
+    "paragraph1": "Ingeniero mecatrónico especializado en automatización industrial, control robótico e integración hardware-software. Experto en el diseño e implementación de arquitecturas de control en tiempo real y análisis de marcha robótica, utilizando firmware de bajo nivel en C/C++ optimizado mediante registros de puerto directos en microcontroladores e integración de métricas de estabilidad basadas en IMU.",
+    "paragraph2": "Cuenta con una sólida capacidad para vincular el control físico de sistemas mecatrónicos con arquitecturas de software modernas, abarcando desde entornos de simulación y sistemas operativos robóticos (ROS 2) hasta infraestructura backend en TypeScript y despliegues contenerizados en Docker. Destaca por un enfoque riguroso en el modelado de datos, análisis de redes e implementación de testing automatizado para garantizar sistemas de automatización altamente confiables, precisos y escalables.",
+    "quote": "La robótica y automatización son la cúspide de los procesos industriales.",
+    "downloadCv": "Descargar CV",
+    "viewProjects": "Ver proyectos"
+  },
+  "projects": {
+    "label": "Portafolio",
+    "titlePrefix": "Mis",
+    "titleHighlight": "Proyectos",
+    "viewAll": "Ver todos los proyectos",
+    "tabs": {
+      "projects": "Proyectos",
+      "stack": "Stack",
+      "certifications": "Certificaciones"
+    },
+    "kind": {
+      "software": "SOFTWARE",
+      "hybrid": "HÍBRIDO",
+      "hardware": "HARDWARE"
+    },
+    "card": {
+      "view": "Ver"
+    },
+    "stack": {
+      "frontend": "Frontend",
+      "backendData": "Backend & datos",
+      "mobile": "Móvil",
+      "tools": "Herramientas"
+    },
+    "certifications": {
+      "comingTitle": "Certificados en camino",
+      "comingBody": "Pronto se listarán aquí las credenciales y cursos. Cada imagen se podrá ampliar con un clic.",
+      "enlarge": "Ampliar: {name}",
+      "close": "Cerrar",
+      "prev": "Certificado anterior",
+      "next": "Certificado siguiente"
+    }
+  },
+  "allProjects": {
+    "back": "Volver al inicio",
+    "eyebrow": "Portafolio",
+    "titlePrefix": "Todos los",
+    "titleHighlight": "proyectos",
+    "count": "{count} proyectos de software, IA y sistemas mecatrónicos — del sensor al usuario."
+  },
+  "contact": {
+    "label": "Contacto",
+    "title": "Hablemos",
+    "subtitle": "¿Tienes algo en mente? Escríbeme y te respondo con una primera lectura técnica.",
+    "formTitle": "Envíame un mensaje",
+    "namePlaceholder": "Tu nombre",
+    "emailPlaceholder": "Tu email",
+    "messagePlaceholder": "Tu mensaje",
+    "send": "Enviar mensaje",
+    "subject": "Contacto de {name}",
+    "connect": "Conecta conmigo",
+    "footer": "Diego Alejandro Caro"
+  }
+}
